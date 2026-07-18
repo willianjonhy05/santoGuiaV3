@@ -13,6 +13,7 @@ import ProfileScreen from '../pages/ProfileScreen';
 import ContactScreen from '../pages/ContactScreen';
 import FavoritesScreen from '../pages/FavoritesScreen';
 import LiturgyScreen from '../pages/LiturgyScreen';
+import SaintOfDayScreen from '../pages/SaintOfDayScreen';
 
 import { COLORS } from '../constants/theme';
 
@@ -172,6 +173,13 @@ export default function Routes() {
             title: 'Liturgia Diária',
         }}
         />
+        <RootStack.Screen
+        name="SaintOfDay"
+        component={SaintOfDayScreen}
+        options={{
+          title: 'Santo do Dia',
+        }}
+      />
       </RootStack.Navigator>
     </NavigationContainer>
   );
