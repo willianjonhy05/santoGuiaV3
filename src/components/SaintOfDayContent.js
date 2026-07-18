@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   Image,
   Linking,
@@ -42,6 +44,13 @@ export default function SaintOfDayContent({
 }) {
   const { width } = useWindowDimensions();
 
+  const [imageRatio, setImageRatio] =
+    useState(1);
+
+  if (!saint) {
+    return null;
+  }
+
   if (!saint) {
     return null;
   }
@@ -81,7 +90,7 @@ export default function SaintOfDayContent({
         </Text>
 
         {saint.titulo &&
-        saint.titulo !== saint.nome ? (
+          saint.titulo !== saint.nome ? (
           <Text style={styles.originalTitle}>
             {saint.titulo}
           </Text>
@@ -89,17 +98,38 @@ export default function SaintOfDayContent({
       </View>
 
       {saint.imagem_url ? (
-        <Image
-          source={{
-            uri: saint.imagem_url,
-          }}
-          resizeMode="cover"
-          accessibilityLabel={
-            saint.imagem_alt ||
-            saint.nome
-          }
-          style={styles.image}
-        />
+        <View style={styles.imageContainer}>
+          <Image
+            source={{
+              uri: saint.imagem_url,
+            }}
+            onLoad={({
+              nativeEvent: {
+                source: {
+                  width: imageWidth,
+                  height: imageHeight,
+                },
+              },
+            }) => {
+              if (imageWidth && imageHeight) {
+                setImageRatio(
+                  imageWidth / imageHeight
+                );
+              }
+            }}
+            resizeMode="contain"
+            accessibilityLabel={
+              saint.imagem_alt ||
+              saint.nome
+            }
+            style={[
+              styles.image,
+              {
+                aspectRatio: imageRatio,
+              },
+            ]}
+          />
+        </View>
       ) : (
         <View style={styles.imageFallback}>
           <Text style={styles.imageFallbackIcon}>
@@ -137,7 +167,7 @@ export default function SaintOfDayContent({
           style={({ pressed }) => [
             styles.sourceButton,
             pressed &&
-              styles.sourceButtonPressed,
+            styles.sourceButtonPressed,
           ]}
         >
           <Text style={styles.sourceButtonText}>
@@ -247,15 +277,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  image: {
+  imageContainer: {
     width: '100%',
     height: 310,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
     borderRadius: 18,
     backgroundColor: COLORS.border,
   },
 
+  image: {
+    height: '100%',
+    maxWidth: '100%',
+    borderRadius: 18,
+  },
+
   imageFallback: {
-    height: 190,
+    width: '100%',
+    height: 310,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,

@@ -52,6 +52,11 @@ export const MOCK_NEWS = [
     title: 'Ação solidária reúne paróquias de Teresina',
     date: '15 jul. 2026',
   },
+  {
+    id: '4',
+    title: 'Novo projeto pastoral visa fortalecer a fé na juventude',
+    date: '14 jul. 2026',
+  },
 ];
 
 export const MOCK_MASSES = [

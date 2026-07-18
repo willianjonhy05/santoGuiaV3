@@ -30,13 +30,13 @@ function formatNewsDate(dateString) {
     'pt-BR',
     {
       day: '2-digit',
-      month: 'short',
+      month: 'long',
       year: 'numeric',
     }
   ).format(date);
 }
 
-export default function NewsCard({
+export default function NewsListItem({
   news,
   onPress,
 }) {
@@ -72,24 +72,16 @@ export default function NewsCard({
         <View style={styles.imageFallback}>
           <Ionicons
             name="newspaper-outline"
-            size={38}
+            size={30}
             color={COLORS.primary}
           />
         </View>
       )}
 
       <View style={styles.content}>
-        <View style={styles.dateRow}>
-          <Ionicons
-            name="calendar-outline"
-            size={14}
-            color={COLORS.textMuted}
-          />
-
-          <Text style={styles.date}>
-            {formatNewsDate(news.date)}
-          </Text>
-        </View>
+        <Text style={styles.date}>
+          {formatNewsDate(news.date)}
+        </Text>
 
         <Text
           style={styles.title}
@@ -101,14 +93,14 @@ export default function NewsCard({
         {news.excerpt ? (
           <Text
             style={styles.excerpt}
-            numberOfLines={3}
+            numberOfLines={2}
           >
             {news.excerpt}
           </Text>
         ) : null}
 
         <Text style={styles.readMore}>
-          Ler notícia
+          Ler mais
         </Text>
       </View>
     </Pressable>
@@ -117,9 +109,9 @@ export default function NewsCard({
 
 const styles = StyleSheet.create({
   container: {
-    width: 280,
+    flexDirection: 'row',
     overflow: 'hidden',
-    marginRight: SPACING.md,
+    marginBottom: SPACING.md,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 16,
@@ -131,54 +123,50 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: '100%',
-    height: 155,
+    width: 115,
+    minHeight: 145,
     backgroundColor: COLORS.border,
   },
 
   imageFallback: {
-    width: '100%',
-    height: 155,
+    width: 115,
+    minHeight: 145,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.background,
   },
 
   content: {
+    flex: 1,
     padding: SPACING.md,
   },
 
-  dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.xs,
-  },
-
   date: {
-    color: COLORS.textMuted,
-    fontSize: 12,
+    color: COLORS.primary,
+    fontSize: 11,
+    fontWeight: '700',
     textTransform: 'capitalize',
   },
 
   title: {
-    marginTop: SPACING.sm,
+    marginTop: SPACING.xs,
     color: COLORS.text,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '800',
-    lineHeight: 23,
+    lineHeight: 22,
   },
 
   excerpt: {
-    marginTop: SPACING.sm,
+    marginTop: SPACING.xs,
     color: COLORS.textMuted,
-    fontSize: 13,
-    lineHeight: 20,
+    fontSize: 12,
+    lineHeight: 18,
   },
 
   readMore: {
-    marginTop: SPACING.md,
+    marginTop: SPACING.sm,
     color: COLORS.primary,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '800',
   },
 });

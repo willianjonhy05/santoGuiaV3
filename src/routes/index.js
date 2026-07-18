@@ -16,6 +16,12 @@ import LiturgyScreen from '../pages/LiturgyScreen';
 import SaintOfDayScreen from '../pages/SaintOfDayScreen';
 import ExaminationOfConscienceScreen from '../pages/ExaminationOfConscienceScreen';
 
+import NewsScreen
+  from '../pages/NewsScreen';
+
+import NewsDetailsScreen
+  from '../pages/NewsDetailsScreen';
+
 import { COLORS } from '../constants/theme';
 
 const Tab = createBottomTabNavigator();
@@ -168,26 +174,41 @@ export default function Routes() {
           }}
         />
         <RootStack.Screen
-        name="Liturgy"
-        component={LiturgyScreen}
-        options={{
+          name="Liturgy"
+          component={LiturgyScreen}
+          options={{
             title: 'Liturgia Diária',
-        }}
+          }}
         />
         <RootStack.Screen
-        name="SaintOfDay"
-        component={SaintOfDayScreen}
-        options={{
-          title: 'Santo do Dia',
-        }}
-      />
-      <RootStack.Screen
-      name="ExaminationOfConscience"
-      component={ExaminationOfConscienceScreen}
-      options={{
-        title: 'Exame de Consciência',
-      }}
-    />
+          name="SaintOfDay"
+          component={SaintOfDayScreen}
+          options={{
+            title: 'Santo do Dia',
+          }}
+        />
+        <RootStack.Screen
+          name="ExaminationOfConscience"
+          component={ExaminationOfConscienceScreen}
+          options={{
+            title: 'Exame de Consciência',
+          }}
+        />
+        <RootStack.Screen
+          name="News"
+          component={NewsScreen}
+          options={{
+            title: 'Notícias',
+          }}
+        />
+
+        <RootStack.Screen
+          name="NewsDetails"
+          component={NewsDetailsScreen}
+          options={{
+            title: 'Notícia',
+          }}
+        />
       </RootStack.Navigator>
     </NavigationContainer>
   );
