@@ -37,7 +37,7 @@ export default function ProfileScreen({ navigation }) {
 
         <View style={styles.links}>
           <CustomButton title="Minhas igrejas favoritas" variant="secondary" onPress={() => navigation.navigate('Favorites')} />
-          <CustomButton title="Formulário de contato" variant="secondary" onPress={() => navigation.navigate('Contact')} />
+          <CustomButton title="Contato" variant="secondary" onPress={() => navigation.navigate('Contact')} />
         </View>
       </ScrollView>
     </ScreenContainer>
