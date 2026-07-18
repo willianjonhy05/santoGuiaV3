@@ -1,4 +1,4 @@
-import { Alert, FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Image, ScrollView, StyleSheet, Text, Platform, useWindowDimensions, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import SectionTitle from '../components/SectionTitle';
 import ChurchCardMini from '../components/ChurchCardMini';
@@ -11,6 +11,8 @@ import { MOCK_CHURCHES, MOCK_MASSES, MOCK_NEWS } from '../data/mockData';
 import { COLORS, SPACING } from '../constants/theme';
 
 export default function HomeScreen({ navigation }) {
+
+
   function showComingSoon(feature) {
     Alert.alert(feature, 'Essa funcionalidade será conectada na próxima etapa.');
   }
@@ -18,7 +20,14 @@ export default function HomeScreen({ navigation }) {
   return (
     <ScreenContainer>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.eyebrow}>SantoGuia</Text>
+        <View style={styles.logoContainer}>
+        <Image
+          source={require('../../assets/logo_oficial.png')}
+          style={styles.logo}
+          resizeMode="contain"
+          accessibilityLabel="SantoGuia"
+        />
+      </View>
         <Text style={styles.title}>Encontre sua próxima celebração</Text>
         <Text style={styles.subtitle}>Igrejas, missas, orações e vida católica em um só lugar.</Text>
 
@@ -99,13 +108,37 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     paddingBottom: SPACING.xl,
   },
-  eyebrow: {
-    color: COLORS.primary,
-    fontSize: 15,
-    fontWeight: '900',
+  logoContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+    marginBottom: SPACING.sm,
   },
+
+  logo: Platform.select({
+    android: {
+      width: 190,
+      height: 112,
+    },
+
+    ios: {
+      width: 120,
+      height: 70,
+    },
+
+    web: {
+      width: 230,
+      height: 134,
+    },
+
+    default: {
+      width: 110,
+      height: 64,
+    },
+  }),
   title: {
-    marginTop: SPACING.xs,
+    marginTop: SPACING.sm,
     color: COLORS.text,
     fontSize: 29,
     fontWeight: '900',

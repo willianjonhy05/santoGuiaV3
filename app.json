@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "santoGuia",
+    "name": "Santo Guia",
     "slug": "santoGuia",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,16 +10,35 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F8F5F1",
+      "primatryColor": "#7A1F2B",
+      "plugins": [
+        [
+          "expo-splash-screen",
+          {
+            "image": "./assets/splash-icon.png",
+            "imageWidth": 220,
+            "resizeMode": "contain",
+            "backgroundColor": "#7A1F2B",
+            "dark":{
+              "image": "./assets/splash-icon.png",
+              "backgroundColor": "#57151E"
+            }
+          }
+        ]
+      ]
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": "./assets/icon.png",
+      "bundleIdentifier": "br.com.missaemteresina.santoguia"
     },
     "android": {
+      "package": "br.com.missaemteresina.santoguia",
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#7A1F2B"
       },
       "edgeToEdgeEnabled": true
     },

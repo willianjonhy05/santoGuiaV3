@@ -3,10 +3,13 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import Routes from './src/routes';
 
+
+
 export default function App() {
   return (
     <KeyboardProvider>
-      <StatusBar style="dark" />
+      <StatusBar style="dark"      
+      />
 
       <Routes />
     </KeyboardProvider>
