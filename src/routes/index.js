@@ -25,6 +25,9 @@ import NewsDetailsScreen
 import ChurchDetailsScreen
   from '../pages/ChurchDetailsScreen';
 
+import ClericDetailsScreen
+  from '../pages/ClericDetailsScreen';
+
 import ChurchMapScreen
   from '../pages/ChurchMapScreen';
 
@@ -220,6 +223,13 @@ export default function Routes() {
           component={ChurchDetailsScreen}
           options={{
             title: 'Detalhes da Igreja',
+          }}
+        />
+        <RootStack.Screen
+          name="ClericDetails"
+          component={ClericDetailsScreen}
+          options={{
+            title: 'Detalhes do clérigo',
           }}
         />
       </RootStack.Navigator>

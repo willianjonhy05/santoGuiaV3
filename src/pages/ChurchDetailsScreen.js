@@ -22,6 +22,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import ChurchCelebrationItem
   from '../components/ChurchCelebrationItem';
 
+import ClericCard
+  from '../components/ClericCard';
+
 import {
   buildChurchMapUrl,
   ChurchApiError,
@@ -39,6 +42,7 @@ export default function ChurchDetailsScreen({
   navigation,
 }) {
   const slug = route.params?.slug;
+
 
   const [church, setChurch] =
     useState(null);
@@ -112,7 +116,7 @@ export default function ChurchDetailsScreen({
 
         setError(
           requestError instanceof
-          ChurchApiError
+            ChurchApiError
             ? requestError.message
             : 'Não foi possível carregar a igreja.'
         );
@@ -132,7 +136,7 @@ export default function ChurchDetailsScreen({
         setCelebrationsError(
           celebrationsResult.reason
             ?.message ||
-            'Não foi possível carregar as celebrações.'
+          'Não foi possível carregar as celebrações.'
         );
       }
 
@@ -469,6 +473,37 @@ export default function ChurchDetailsScreen({
         </View>
       ) : null}
 
+      {church.clerigos?.length > 0 ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Clérigos
+          </Text>
+
+          <Text style={styles.sectionDescription}>
+            Sacerdotes e clérigos vinculados a
+            esta igreja.
+          </Text>
+
+          {church.clerigos.map((cleric) => (
+            <ClericCard
+              key={String(
+                cleric.id || cleric.slug
+              )}
+              cleric={cleric}
+              onPress={() =>
+                navigation.navigate(
+                  'ClericDetails',
+                  {
+                    slug: cleric.slug,
+                    initialCleric: cleric,
+                  }
+                )
+              }
+            />
+          ))}
+        </View>
+      ) : null}
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>
           Horários das celebrações
@@ -483,7 +518,7 @@ export default function ChurchDetailsScreen({
         ) : null}
 
         {!celebrationsError &&
-        celebrations.length === 0 ? (
+          celebrations.length === 0 ? (
           <View style={styles.empty}>
             <Ionicons
               name="time-outline"
@@ -698,5 +733,12 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: COLORS.surface,
     fontWeight: '800',
+  },
+  sectionDescription: {
+    marginTop: -SPACING.sm,
+    marginBottom: SPACING.md,
+    color: COLORS.textMuted,
+    fontSize: 13,
+    lineHeight: 19,
   },
 });

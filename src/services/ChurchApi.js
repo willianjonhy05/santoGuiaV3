@@ -1,182 +1,423 @@
 const API_BASE_URL =
-    'https://missaemteresina.com.br/api';
+  'https://missaemteresina.com.br/api';
 
 const REQUEST_TIMEOUT = 15000;
 
 const cache = new Map();
 
-export class ChurchApiError extends Error {
-    constructor(message, options = {}) {
-        super(message);
 
-        this.name = 'ChurchApiError';
-        this.status = options.status;
-        this.code = options.code;
-        this.data = options.data;
-    }
+export class ChurchApiError
+  extends Error {
+  constructor(
+    message,
+    options = {}
+  ) {
+    super(message);
+
+    this.name =
+      'ChurchApiError';
+
+    this.status =
+      options.status;
+
+    this.code =
+      options.code;
+
+    this.data =
+      options.data;
+  }
 }
+
 
 function parseNumber(value) {
-    if (
-        value === null ||
-        value === undefined ||
-        value === ''
-    ) {
-        return null;
-    }
+  if (
+    value === null ||
+    value === undefined ||
+    value === ''
+  ) {
+    return null;
+  }
 
-    const parsed = Number(
-        String(value).replace(',', '.')
+  const parsed =
+    Number(
+      String(value)
+        .replace(',', '.')
     );
 
-    return Number.isFinite(parsed)
-        ? parsed
-        : null;
+  return Number.isFinite(parsed)
+    ? parsed
+    : null;
 }
+
 
 function normalizeText(value) {
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return '';
-    }
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return '';
+  }
 
-    return String(value).trim();
+  return String(value).trim();
 }
+
 
 function stripHtml(value) {
-    if (!value) {
-        return '';
-    }
+  if (!value) {
+    return '';
+  }
 
-    return String(value)
-        .replace(/<br\s*\/?>/gi, '\n')
-        .replace(/<\/p>/gi, '\n')
-        .replace(/<[^>]+>/g, '')
-        .replace(/&nbsp;/gi, ' ')
-        .replace(/&amp;/gi, '&')
-        .replace(/&#8211;/gi, '–')
-        .replace(/&#8212;/gi, '—')
-        .replace(/\n{3,}/g, '\n\n')
-        .trim();
+  return String(value)
+    .replace(
+      /<br\s*\/?>/gi,
+      '\n'
+    )
+    .replace(
+      /<\/p>/gi,
+      '\n'
+    )
+    .replace(
+      /<[^>]+>/g,
+      ''
+    )
+    .replace(
+      /&nbsp;/gi,
+      ' '
+    )
+    .replace(
+      /&amp;/gi,
+      '&'
+    )
+    .replace(
+      /&#8211;/gi,
+      '–'
+    )
+    .replace(
+      /&#8212;/gi,
+      '—'
+    )
+    .replace(
+      /\n{3,}/g,
+      '\n\n'
+    )
+    .trim();
 }
 
+
+function normalizeCleric(data) {
+  if (
+    !data ||
+    typeof data !== 'object'
+  ) {
+    return null;
+  }
+
+  return {
+    id:
+      data.id,
+
+    nome:
+      normalizeText(
+        data.nome
+      ) ||
+      'Clérigo',
+
+    slug:
+      normalizeText(
+        data.slug
+      ),
+
+    titulo:
+      normalizeText(
+        data.titulo
+      ),
+
+    grau_ordem:
+      normalizeText(
+        data.grau_ordem
+      ),
+
+    situacao:
+      normalizeText(
+        data.situacao
+      ),
+
+    paroco:
+      Boolean(
+        data.paroco
+      ),
+
+    monsenhor:
+      Boolean(
+        data.monsenhor
+      ),
+
+    vigario_arq:
+      Boolean(
+        data.vigario_arq
+      ),
+
+    oficio:
+      normalizeText(
+        data.oficio
+      ),
+
+    religioso:
+      Boolean(
+        data.religioso
+      ),
+
+    ordem:
+      normalizeText(
+        data.ordem
+      ),
+
+    sigla_ordem:
+      normalizeText(
+        data.sigla_ordem
+      ),
+
+    biografia:
+      stripHtml(
+        data.biografia
+      ),
+
+    data_nasc:
+      normalizeText(
+        data.data_nasc
+      ),
+
+    idade:
+      data.idade ??
+      null,
+
+    data_ordenacao_diaconal:
+      normalizeText(
+        data
+          .data_ordenacao_diaconal
+      ),
+
+    data_ordenacao_presbiteral:
+      normalizeText(
+        data
+          .data_ordenacao_presbiteral
+      ),
+
+    data_ordenacao_episcopal:
+      normalizeText(
+        data
+          .data_ordenacao_episcopal
+      ),
+
+    idade_ministerio:
+      data.idade_ministerio ??
+      null,
+
+    email:
+      normalizeText(
+        data.email
+      ),
+
+    telefone:
+      normalizeText(
+        data.telefone
+      ),
+
+    facebook:
+      normalizeText(
+        data.facebook
+      ),
+
+    instagram:
+      normalizeText(
+        data.instagram
+      ),
+
+    instagram_url:
+      normalizeText(
+        data.instagram_url
+      ),
+
+    youtube:
+      normalizeText(
+        data.youtube
+      ),
+
+    foto_url:
+      normalizeText(
+        data.foto_url
+      ),
+
+    detalhe_url:
+      normalizeText(
+        data.detalhe_url
+      ),
+
+    raw:
+      data,
+  };
+}
+
+
 function normalizeChurch(data) {
-    if (!data || typeof data !== 'object') {
-        return null;
-    }
+  if (
+    !data ||
+    typeof data !== 'object'
+  ) {
+    return null;
+  }
 
-    const endereco = normalizeText(
-        data.endereco
+  const endereco =
+    normalizeText(
+      data.endereco
     );
 
-    const bairro = normalizeText(
-        data.bairro
+  const bairro =
+    normalizeText(
+      data.bairro
     );
 
-    const cidade = normalizeText(
-        data.cidade
+  const cidade =
+    normalizeText(
+      data.cidade
     );
 
-    return {
-        id: data.id,
+  return {
+    id:
+      data.id,
 
-        nome:
-            normalizeText(data.nome) ||
-            'Igreja sem nome',
+    nome:
+      normalizeText(
+        data.nome
+      ) ||
+      'Igreja sem nome',
 
-        slug: normalizeText(data.slug),
+    slug:
+      normalizeText(
+        data.slug
+      ),
 
+    endereco,
+    bairro,
+    cidade,
+
+    enderecoCompleto:
+      [
         endereco,
         bairro,
         cidade,
+      ]
+        .filter(Boolean)
+        .join(' · '),
 
-        enderecoCompleto: [
-            endereco,
-            bairro,
-            cidade,
-        ]
-            .filter(Boolean)
-            .join(' · '),
+    paroquia:
+      Boolean(
+        data.paroquia
+      ),
 
-        paroquia: Boolean(data.paroquia),
-        capela: Boolean(data.capela),
+    capela:
+      Boolean(
+        data.capela
+      ),
 
-        aberta_ao_publico:
-            data.aberta_ao_publico ?? null,
+    aberta_ao_publico:
+      data
+        .aberta_ao_publico ??
+      null,
 
-        latitude: parseNumber(
-            data.latitude
-        ),
+    latitude:
+      parseNumber(
+        data.latitude
+      ),
 
-        longitude: parseNumber(
-            data.longitude
-        ),
+    longitude:
+      parseNumber(
+        data.longitude
+      ),
 
-        distancia_km: parseNumber(
-            data.distancia_km
-        ),
+    distancia_km:
+      parseNumber(
+        data.distancia_km
+      ),
 
-        imagem_url: normalizeText(
-            data.imagem_url
-        ),
+    imagem_url:
+      normalizeText(
+        data.imagem_url
+      ),
 
-        telefone: normalizeText(
-            data.telefone
-        ),
+    telefone:
+      normalizeText(
+        data.telefone
+      ),
 
-        email: normalizeText(
-            data.email
-        ),
+    email:
+      normalizeText(
+        data.email
+      ),
 
-        site: normalizeText(
-            data.site
-        ),
+    site:
+      normalizeText(
+        data.site
+      ),
 
-        facebook: normalizeText(
-            data.facebook
-        ),
+    facebook:
+      normalizeText(
+        data.facebook
+      ),
 
-        instagram: normalizeText(
-            data.instagram
-        ),
+    instagram:
+      normalizeText(
+        data.instagram
+      ),
 
-        instagram_url: normalizeText(
-            data.instagram_url
-        ),
+    instagram_url:
+      normalizeText(
+        data.instagram_url
+      ),
 
-        youtube: normalizeText(
-            data.youtube
-        ),
+    youtube:
+      normalizeText(
+        data.youtube
+      ),
 
-        maps_url: normalizeText(
-            data.maps
-        ),
+    maps_url:
+      normalizeText(
+        data.maps
+      ),
 
-        contato_whatsapp: normalizeText(
-            data.contato_whatsapp
-        ),
+    contato_whatsapp:
+      normalizeText(
+        data.contato_whatsapp
+      ),
 
-        whatsapp_url: normalizeText(
-            data.whatsapp_url
-        ),
+    whatsapp_url:
+      normalizeText(
+        data.whatsapp_url
+      ),
 
-        detalhe_url: normalizeText(
-            data.detalhe_url
-        ),
+    detalhe_url:
+      normalizeText(
+        data.detalhe_url
+      ),
 
-        sacerdotes:
-            data.sacerdotes || null,
+    sacerdotes:
+      data.sacerdotes ||
+      null,
 
-        clerigos: Array.isArray(
-            data.clerigos
-        )
-            ? data.clerigos
-            : [],
+    clerigos:
+      Array.isArray(
+        data.clerigos
+      )
+        ? data.clerigos
+          .map(
+            normalizeCleric
+          )
+          .filter(Boolean)
+        : [],
 
-        raw: data,
-    };
+    raw:
+      data,
+  };
 }
 
 
@@ -185,22 +426,26 @@ function normalizeCelebration(
 ) {
   if (
     !celebration ||
-    typeof celebration !== 'object'
+    typeof celebration !==
+    'object'
   ) {
     return null;
   }
 
   return {
-    id: celebration.id,
+    id:
+      celebration.id,
 
     nome:
       normalizeText(
         celebration.nome
-      ) || 'Celebração',
+      ) ||
+      'Celebração',
 
-    categoria: normalizeText(
-      celebration.categoria
-    ),
+    categoria:
+      normalizeText(
+        celebration.categoria
+      ),
 
     categoriaDisplay:
       normalizeText(
@@ -208,9 +453,10 @@ function normalizeCelebration(
           .categoria_display
       ),
 
-    recorrencia: normalizeText(
-      celebration.recorrencia
-    ),
+    recorrencia:
+      normalizeText(
+        celebration.recorrencia
+      ),
 
     recorrenciaDisplay:
       normalizeText(
@@ -224,24 +470,29 @@ function normalizeCelebration(
           .descricao_recorrencia
       ),
 
-    dia: normalizeText(
-      celebration.dia
-    ),
+    dia:
+      normalizeText(
+        celebration.dia
+      ),
 
-    diaDisplay: normalizeText(
-      celebration.dia_display
-    ),
+    diaDisplay:
+      normalizeText(
+        celebration.dia_display
+      ),
 
     diaMes:
-      celebration.dia_mes ?? null,
+      celebration.dia_mes ??
+      null,
 
     semanaDoMes:
-      celebration.semana_do_mes ??
+      celebration
+        .semana_do_mes ??
       null,
 
     dataEspecifica:
       normalizeText(
-        celebration.data_especifica
+        celebration
+          .data_especifica
       ),
 
     proximaData:
@@ -257,12 +508,14 @@ function normalizeCelebration(
 
     horarioInicio:
       normalizeText(
-        celebration.horario_inicio
+        celebration
+          .horario_inicio
       ),
 
     horarioFim:
       normalizeText(
-        celebration.horario_fim
+        celebration
+          .horario_fim
       ),
 
     descricao:
@@ -270,252 +523,307 @@ function normalizeCelebration(
         celebration.descricao
       ),
 
-    exigeAgendamento: Boolean(
-      celebration.exige_agendamento
-    ),
+    exigeAgendamento:
+      Boolean(
+        celebration
+          .exige_agendamento
+      ),
 
-    igreja: celebration.igreja
-      ? normalizeChurch(
+    igreja:
+      celebration.igreja
+        ? normalizeChurch(
           celebration.igreja
         )
-      : null,
+        : null,
 
-    raw: celebration,
+    raw:
+      celebration,
   };
 }
 
 
-
-function extractCelebrations(data) {
-    if (Array.isArray(data)) {
-        return data;
-    }
-
-    const possibleLists = [
-        data?.celebracoes,
-        data?.resultados,
-        data?.results,
-        data?.horarios,
-        data?.dados,
-    ];
-
-    return (
-        possibleLists.find(Array.isArray) ||
-        []
-    );
-}
-
 function extractErrorMessage(
-    data,
-    status
+  data,
+  status
 ) {
-    const message =
-        data?.erro ||
-        data?.detail ||
-        data?.mensagem ||
-        data?.message;
+  const message =
+    data?.erro ||
+    data?.detail ||
+    data?.mensagem ||
+    data?.message;
 
-    if (message) {
-        if (typeof message === 'string') {
-            return message;
-        }
+  if (message) {
+    return (
+      typeof message ===
+      'string'
+        ? message
+        : JSON.stringify(
+          message
+        )
+    );
+  }
 
-        return JSON.stringify(message);
-    }
+  if (status === 404) {
+    return (
+      'O conteúdo solicitado não foi encontrado.'
+    );
+  }
 
-    if (status === 404) {
-        return 'A igreja solicitada não foi encontrada.';
-    }
+  if (status >= 500) {
+    return (
+      'O servidor está temporariamente indisponível.'
+    );
+  }
 
-    if (status >= 500) {
-        return 'O servidor está temporariamente indisponível.';
-    }
-
-    return 'Não foi possível carregar as informações.';
+  return (
+    'Não foi possível carregar as informações.'
+  );
 }
+
 
 async function requestJson(
-    url,
-    {
-        signal,
-    } = {}
+  url,
+  {
+    signal,
+  } = {}
 ) {
-    const controller =
-        new AbortController();
+  const controller =
+    new AbortController();
 
-    let timedOut = false;
+  let timedOut = false;
 
-    function handleExternalAbort() {
-        controller.abort();
-    }
 
-    if (signal) {
-        if (signal.aborted) {
-            controller.abort();
-        } else {
-            signal.addEventListener(
-                'abort',
-                handleExternalAbort,
-                {
-                    once: true,
-                }
-            );
+  function handleExternalAbort() {
+    controller.abort();
+  }
+
+
+  if (signal) {
+    if (signal.aborted) {
+      controller.abort();
+    } else {
+      signal.addEventListener(
+        'abort',
+        handleExternalAbort,
+        {
+          once: true,
         }
+      );
     }
+  }
 
-    const timeoutId = setTimeout(() => {
-        timedOut = true;
-        controller.abort();
+
+  const timeoutId =
+    setTimeout(() => {
+      timedOut = true;
+      controller.abort();
     }, REQUEST_TIMEOUT);
 
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
 
-            headers: {
-                Accept: 'application/json',
-            },
-
-            signal: controller.signal,
-        });
-
-        let data = null;
-
-        try {
-            data = await response.json();
-        } catch {
-            data = null;
-        }
-
-        if (!response.ok) {
-            throw new ChurchApiError(
-                extractErrorMessage(
-                    data,
-                    response.status
-                ),
-                {
-                    status: response.status,
-                    code:
-                        data?.code ||
-                        'request_failed',
-                    data,
-                }
-            );
-        }
-
-        return data;
-    } catch (error) {
-        if (
-            error instanceof ChurchApiError
-        ) {
-            throw error;
-        }
-
-        if (error?.name === 'AbortError') {
-            if (signal?.aborted) {
-                throw error;
-            }
-
-            if (timedOut) {
-                throw new ChurchApiError(
-                    'O servidor demorou muito para responder.',
-                    {
-                        code: 'request_timeout',
-                    }
-                );
-            }
-
-            throw error;
-        }
-
-        throw new ChurchApiError(
-            'Não foi possível conectar ao servidor. Verifique sua internet.',
-            {
-                code: 'network_error',
-            }
-        );
-    } finally {
-        clearTimeout(timeoutId);
-
-        if (signal) {
-            signal.removeEventListener(
-                'abort',
-                handleExternalAbort
-            );
-        }
-    }
-}
-
-export async function getNearbyChurches(
-    {
-        latitude,
-        longitude,
-        signal,
-        ignoreCache = false,
-    }
-) {
-    if (
-        !Number.isFinite(latitude) ||
-        !Number.isFinite(longitude)
-    ) {
-        throw new ChurchApiError(
-            'A localização do usuário é inválida.',
-            {
-                code: 'invalid_location',
-            }
-        );
-    }
-
-    const cacheKey =
-        `nearby:${latitude.toFixed(3)}:` +
-        longitude.toFixed(3);
-
-    if (
-        !ignoreCache &&
-        cache.has(cacheKey)
-    ) {
-        return cache.get(cacheKey);
-    }
-
-    const params = new URLSearchParams({
-        latitude: String(latitude),
-        longitude: String(longitude),
-    });
-
-    const data = await requestJson(
-        `${API_BASE_URL}/igrejas/proximas/?${params.toString()}`,
+  try {
+    const response =
+      await fetch(
+        url,
         {
-            signal,
+          method: 'GET',
+
+          headers: {
+            Accept:
+              'application/json',
+          },
+
+          signal:
+            controller.signal,
         }
+      );
+
+    let data = null;
+
+    try {
+      data =
+        await response.json();
+    } catch {
+      data = null;
+    }
+
+
+    if (!response.ok) {
+      throw new ChurchApiError(
+        extractErrorMessage(
+          data,
+          response.status
+        ),
+        {
+          status:
+            response.status,
+
+          code:
+            data?.code ||
+            'request_failed',
+
+          data,
+        }
+      );
+    }
+
+    return data;
+  } catch (error) {
+    if (
+      error instanceof
+      ChurchApiError
+    ) {
+      throw error;
+    }
+
+
+    if (
+      error?.name ===
+      'AbortError'
+    ) {
+      if (signal?.aborted) {
+        throw error;
+      }
+
+      if (timedOut) {
+        throw new ChurchApiError(
+          'O servidor demorou muito para responder.',
+          {
+            code:
+              'request_timeout',
+          }
+        );
+      }
+
+      throw error;
+    }
+
+
+    throw new ChurchApiError(
+      'Não foi possível conectar ao servidor. Verifique sua internet.',
+      {
+        code:
+          'network_error',
+      }
+    );
+  } finally {
+    clearTimeout(
+      timeoutId
     );
 
-    if (!Array.isArray(data?.resultados)) {
-        throw new ChurchApiError(
-            'A API retornou uma lista de igrejas inválida.',
-            {
-                code: 'invalid_response',
-                data,
-            }
-        );
+    if (signal) {
+      signal.removeEventListener(
+        'abort',
+        handleExternalAbort
+      );
     }
-
-    const result = {
-        total:
-            data.total ??
-            data.resultados.length,
-
-        igrejas: data.resultados
-            .map(normalizeChurch)
-            .filter(Boolean),
-    };
-
-    cache.set(cacheKey, result);
-
-    return result;
+  }
 }
 
 
-export async function getChurchBySlug(
+export async function
+getNearbyChurches({
+  latitude,
+  longitude,
+  signal,
+  ignoreCache = false,
+}) {
+  if (
+    !Number.isFinite(
+      latitude
+    ) ||
+    !Number.isFinite(
+      longitude
+    )
+  ) {
+    throw new ChurchApiError(
+      'A localização do usuário é inválida.',
+      {
+        code:
+          'invalid_location',
+      }
+    );
+  }
+
+
+  const cacheKey =
+    `nearby:${
+      latitude.toFixed(3)
+    }:${
+      longitude.toFixed(3)
+    }`;
+
+
+  if (
+    !ignoreCache &&
+    cache.has(cacheKey)
+  ) {
+    return cache.get(
+      cacheKey
+    );
+  }
+
+
+  const params =
+    new URLSearchParams({
+      latitude:
+        String(latitude),
+
+      longitude:
+        String(longitude),
+    });
+
+
+  const data =
+    await requestJson(
+      `${API_BASE_URL}/igrejas/proximas/?${params.toString()}`,
+      {
+        signal,
+      }
+    );
+
+
+  if (
+    !Array.isArray(
+      data?.resultados
+    )
+  ) {
+    throw new ChurchApiError(
+      'A API retornou uma lista de igrejas inválida.',
+      {
+        code:
+          'invalid_response',
+
+        data,
+      }
+    );
+  }
+
+
+  const result = {
+    total:
+      data.total ??
+      data.resultados.length,
+
+    igrejas:
+      data.resultados
+        .map(
+          normalizeChurch
+        )
+        .filter(Boolean),
+  };
+
+
+  cache.set(
+    cacheKey,
+    result
+  );
+
+  return result;
+}
+
+
+export async function
+getChurchBySlug(
   slug,
   {
     signal,
@@ -526,51 +834,71 @@ export async function getChurchBySlug(
     throw new ChurchApiError(
       'O slug da igreja não foi informado.',
       {
-        code: 'missing_slug',
+        code:
+          'missing_slug',
       }
     );
   }
 
+
+  const normalizedSlug =
+    String(slug).trim();
+
   const cacheKey =
-    `church:${slug}`;
+    `church:${normalizedSlug}`;
+
 
   if (
     !ignoreCache &&
     cache.has(cacheKey)
   ) {
-    return cache.get(cacheKey);
+    return cache.get(
+      cacheKey
+    );
   }
 
-  const data = await requestJson(
-    `${API_BASE_URL}/igrejas/${encodeURIComponent(
-      slug
-    )}/`,
-    {
-      signal,
-    }
-  );
+
+  const data =
+    await requestJson(
+      `${API_BASE_URL}/igrejas/${
+        encodeURIComponent(
+          normalizedSlug
+        )
+      }/`,
+      {
+        signal,
+      }
+    );
+
 
   const church =
     normalizeChurch(data);
+
 
   if (!church) {
     throw new ChurchApiError(
       'A API retornou dados inválidos da igreja.',
       {
-        code: 'invalid_church',
+        code:
+          'invalid_church',
+
         data,
       }
     );
   }
 
-  cache.set(cacheKey, church);
+
+  cache.set(
+    cacheKey,
+    church
+  );
 
   return church;
 }
 
 
-
-export async function getChurchCelebrations(
+export async function
+getChurchCelebrations(
   slug,
   {
     signal,
@@ -581,43 +909,63 @@ export async function getChurchCelebrations(
     throw new ChurchApiError(
       'O slug da igreja não foi informado.',
       {
-        code: 'missing_slug',
+        code:
+          'missing_slug',
       }
     );
   }
 
+
+  const normalizedSlug =
+    String(slug).trim();
+
   const cacheKey =
-    `celebrations:${slug}`;
+    `celebrations:${normalizedSlug}`;
+
 
   if (
     !ignoreCache &&
     cache.has(cacheKey)
   ) {
-    return cache.get(cacheKey);
+    return cache.get(
+      cacheKey
+    );
   }
 
-  const data = await requestJson(
-    `${API_BASE_URL}/igrejas/${encodeURIComponent(
-      slug
-    )}/celebracoes/`,
-    {
-      signal,
-    }
-  );
+
+  const data =
+    await requestJson(
+      `${API_BASE_URL}/igrejas/${
+        encodeURIComponent(
+          normalizedSlug
+        )
+      }/celebracoes/`,
+      {
+        signal,
+      }
+    );
+
 
   if (!Array.isArray(data)) {
     throw new ChurchApiError(
       'A API retornou uma lista de celebrações inválida.',
       {
-        code: 'invalid_celebrations',
+        code:
+          'invalid_celebrations',
+
         data,
       }
     );
   }
 
-  const celebrations = data
-    .map(normalizeCelebration)
-    .filter(Boolean);
+
+  const celebrations =
+    data
+      .map(
+        normalizeCelebration
+      )
+      .filter(Boolean);
+
 
   cache.set(
     cacheKey,
@@ -628,36 +976,119 @@ export async function getChurchCelebrations(
 }
 
 
-export function buildChurchMapUrl(
-    church
+export async function
+getClericBySlug(
+  slug,
+  {
+    signal,
+    ignoreCache = false,
+  } = {}
 ) {
-    if (church?.maps_url) {
-        return church.maps_url;
-    }
+  if (!slug) {
+    throw new ChurchApiError(
+      'O slug do clérigo não foi informado.',
+      {
+        code:
+          'missing_cleric_slug',
+      }
+    );
+  }
 
-    if (
-        !Number.isFinite(
-            church?.latitude
-        ) ||
-        !Number.isFinite(
-            church?.longitude
+
+  const normalizedSlug =
+    String(slug).trim();
+
+  const cacheKey =
+    `cleric:${normalizedSlug}`;
+
+
+  if (
+    !ignoreCache &&
+    cache.has(cacheKey)
+  ) {
+    return cache.get(
+      cacheKey
+    );
+  }
+
+
+  const data =
+    await requestJson(
+      `${API_BASE_URL}/clerigos/${
+        encodeURIComponent(
+          normalizedSlug
         )
-    ) {
-        return null;
-    }
-
-    const query = encodeURIComponent(
-        `${church.latitude},${church.longitude}`
+      }/`,
+      {
+        signal,
+      }
     );
 
-    return (
-        'https://www.google.com/maps/' +
-        `search/?api=1&query=${query}`
+
+  const cleric =
+    normalizeCleric(data);
+
+
+  if (!cleric) {
+    throw new ChurchApiError(
+      'A API retornou dados inválidos do clérigo.',
+      {
+        code:
+          'invalid_cleric',
+
+        data,
+      }
     );
+  }
+
+
+  cache.set(
+    cacheKey,
+    cleric
+  );
+
+  return cleric;
 }
 
 
-export async function getChurches({
+export function
+buildChurchMapUrl(church) {
+  if (church?.maps_url) {
+    return church.maps_url;
+  }
+
+
+  if (
+    !Number.isFinite(
+      church?.latitude
+    ) ||
+    !Number.isFinite(
+      church?.longitude
+    )
+  ) {
+    return null;
+  }
+
+
+  const query =
+    encodeURIComponent(
+      `${
+        church.latitude
+      },${
+        church.longitude
+      }`
+    );
+
+
+  return (
+    'https://www.google.com/maps/' +
+    `search/?api=1&query=${query}`
+  );
+}
+
+
+export async function
+getChurches({
   search = '',
   latitude,
   longitude,
@@ -666,11 +1097,14 @@ export async function getChurches({
 } = {}) {
   let url = pageUrl;
 
+
   if (!url) {
-    const params = new URLSearchParams();
+    const params =
+      new URLSearchParams();
 
     const normalizedSearch =
       search.trim();
+
 
     if (normalizedSearch) {
       params.append(
@@ -679,9 +1113,14 @@ export async function getChurches({
       );
     }
 
+
     if (
-      Number.isFinite(latitude) &&
-      Number.isFinite(longitude)
+      Number.isFinite(
+        latitude
+      ) &&
+      Number.isFinite(
+        longitude
+      )
     ) {
       params.append(
         'latitude',
@@ -694,58 +1133,86 @@ export async function getChurches({
       );
     }
 
+
     const queryString =
       params.toString();
 
+
     url =
       `${API_BASE_URL}/igrejas/` +
-      (queryString
-        ? `?${queryString}`
-        : '');
+      (
+        queryString
+          ? `?${queryString}`
+          : ''
+      );
   }
 
-  const data = await requestJson(url, {
-    signal,
-  });
 
-  // Resposta paginada do Django REST Framework.
+  const data =
+    await requestJson(
+      url,
+      {
+        signal,
+      }
+    );
+
+
   if (
     data &&
-    Array.isArray(data.results)
+    Array.isArray(
+      data.results
+    )
   ) {
     return {
       total:
         data.count ??
         data.results.length,
 
-      next: data.next || null,
+      next:
+        data.next ||
+        null,
 
       previous:
-        data.previous || null,
+        data.previous ||
+        null,
 
-      igrejas: data.results
-        .map(normalizeChurch)
-        .filter(Boolean),
+      igrejas:
+        data.results
+          .map(
+            normalizeChurch
+          )
+          .filter(Boolean),
     };
   }
 
-  // Resposta sem paginação.
+
   if (Array.isArray(data)) {
     return {
-      total: data.length,
-      next: null,
-      previous: null,
+      total:
+        data.length,
 
-      igrejas: data
-        .map(normalizeChurch)
-        .filter(Boolean),
+      next:
+        null,
+
+      previous:
+        null,
+
+      igrejas:
+        data
+          .map(
+            normalizeChurch
+          )
+          .filter(Boolean),
     };
   }
+
 
   throw new ChurchApiError(
     'A API retornou uma lista de igrejas inválida.',
     {
-      code: 'invalid_church_list',
+      code:
+        'invalid_church_list',
+
       data,
     }
   );
