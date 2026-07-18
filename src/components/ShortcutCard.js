@@ -1,34 +1,73 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { COLORS, RADIUS, SPACING } from '../constants/theme';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+} from 'react-native';
 
-export default function ShortcutCard({ title, icon, onPress }) {
+import Ionicons from '@expo/vector-icons/Ionicons';
+
+import {
+  COLORS,
+  RADIUS,
+  SPACING,
+} from '../constants/theme';
+
+export default function ShortcutCard({
+  title,
+  icon,
+  onPress,
+}) {
   return (
-    <Pressable style={styles.card} onPress={onPress}>
-      <Ionicons name={icon} size={26} color={COLORS.primary} />
-      <Text style={styles.title}>{title}</Text>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      style={({ pressed }) => [
+        styles.card,
+        pressed && styles.cardPressed,
+      ]}
+    >
+      <Ionicons
+        name={icon}
+        size={26}
+        color={COLORS.primary}
+      />
+
+      <Text style={styles.title}>
+        {title}
+      </Text>
+
+      <Ionicons
+        name="chevron-forward"
+        size={20}
+        color={COLORS.textMuted}
+      />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: '48%',
-    minHeight: 105,
+    width: '100%',
+    minHeight: 72,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     padding: SPACING.md,
-    marginBottom: SPACING.md,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.surface,
   },
+
+  cardPressed: {
+    opacity: 0.72,
+  },
+
   title: {
-    marginTop: SPACING.sm,
+    flex: 1,
+    marginLeft: SPACING.md,
     color: COLORS.text,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
-    textAlign: 'center',
   },
 });

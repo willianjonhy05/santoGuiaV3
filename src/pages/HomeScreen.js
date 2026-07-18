@@ -5,7 +5,6 @@ import ChurchCardMini from '../components/ChurchCardMini';
 import NewsCard from '../components/NewsCard';
 import ShortcutCard from '../components/ShortcutCard';
 import NextMassItem from '../components/NextMassItem';
-import CustomButton from '../components/CustomButton';
 import DailyLiturgyPreview from '../components/DailyLiturgyPreview';
 import { MOCK_CHURCHES, MOCK_MASSES } from '../data/mockData';
 import { COLORS, SPACING } from '../constants/theme';
@@ -30,7 +29,7 @@ export default function HomeScreen({ navigation }) {
   const [newsError, setNewsError] =
     useState(null);
 
-  
+
 
   const loadLatestNews = useCallback(
     async ({
@@ -143,10 +142,33 @@ export default function HomeScreen({ navigation }) {
 
         <View style={styles.section}>
           <SectionTitle title="Serviços" />
-          <View style={styles.actionGap}>
-            <CustomButton title="Adorações" variant="secondary" onPress={() => showComingSoon('Adorações')} />
-            <CustomButton title="Confissões" variant="secondary" onPress={() => showComingSoon('Confissões')} />
-            <CustomButton title="Navegar no mapa" onPress={() => showComingSoon('Mapa de Igrejas')} />
+
+          <View style={styles.servicesList}>
+            <ShortcutCard
+              title="Adorações"
+              icon="heart-outline"
+              onPress={() =>
+                showComingSoon('Adorações')
+              }
+            />
+
+            <ShortcutCard
+              title="Confissões"
+              icon="chatbubble-ellipses-outline"
+              onPress={() =>
+                showComingSoon('Confissões')
+              }
+            />
+
+            <ShortcutCard
+              title="Navegar no mapa"
+              icon="map-outline"
+              onPress={() =>
+                navigation.navigate(
+                  'ChurchMap'
+                )
+              }
+            />
           </View>
         </View>
 
@@ -239,6 +261,9 @@ const styles = StyleSheet.create({
     overflow: 'visible',
     marginBottom: SPACING.sm,
   },
+  servicesList: {
+    gap: SPACING.sm,
+  },
 
   logo: Platform.select({
     android: {
@@ -278,44 +303,43 @@ const styles = StyleSheet.create({
     marginTop: SPACING.lg,
   },
   shortcutsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    gap: SPACING.sm,
   },
   actionGap: {
     gap: SPACING.sm,
   },
   newsLoading: {
-  minHeight: 100,
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: SPACING.sm,
-},
+    minHeight: 100,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+  },
 
-newsLoadingText: {
-  color: COLORS.textMuted,
-  fontSize: 13,
-},
+  newsLoadingText: {
+    color: COLORS.textMuted,
+    fontSize: 13,
+  },
 
-newsError: {
-  alignItems: 'center',
-  padding: SPACING.md,
-  borderWidth: 1,
-  borderColor: COLORS.border,
-  borderRadius: 12,
-  backgroundColor: COLORS.surface,
-},
+  newsError: {
+    alignItems: 'center',
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    backgroundColor: COLORS.surface,
+  },
 
-newsErrorText: {
-  color: COLORS.textMuted,
-  lineHeight: 20,
-  textAlign: 'center',
-},
+  newsErrorText: {
+    color: COLORS.textMuted,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
 
-newsRetry: {
-  marginTop: SPACING.sm,
-  color: COLORS.primary,
-  fontWeight: '800',
-},
+  newsRetry: {
+    marginTop: SPACING.sm,
+    color: COLORS.primary,
+    fontWeight: '800',
+  },
 });

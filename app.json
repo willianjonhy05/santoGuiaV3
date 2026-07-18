@@ -20,10 +20,16 @@
             "imageWidth": 220,
             "resizeMode": "contain",
             "backgroundColor": "#7A1F2B",
-            "dark":{
+            "dark": {
               "image": "./assets/splash-icon.png",
               "backgroundColor": "#57151E"
             }
+          }
+        ],
+        [
+          "expo-location",
+          {
+            "locationWhenInUsePermission": "Permita que o SantoGuia use sua localização para encontrar as igrejas mais próximas."
           }
         ]
       ]

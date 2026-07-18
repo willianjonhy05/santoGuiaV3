@@ -22,6 +22,9 @@ import NewsScreen
 import NewsDetailsScreen
   from '../pages/NewsDetailsScreen';
 
+import ChurchMapScreen
+  from '../pages/ChurchMapScreen';
+
 import { COLORS } from '../constants/theme';
 
 const Tab = createBottomTabNavigator();
@@ -207,6 +210,13 @@ export default function Routes() {
           component={NewsDetailsScreen}
           options={{
             title: 'Notícia',
+          }}
+        />
+        <RootStack.Screen
+          name="ChurchMap"
+          component={ChurchMapScreen}
+          options={{
+            title: 'Mapa de Igrejas',
           }}
         />
       </RootStack.Navigator>
