@@ -1,12 +1,11 @@
 import { Alert, FlatList, Image, ScrollView, ActivityIndicator, Pressable, StyleSheet, Text, Platform, useWindowDimensions, View } from 'react-native';
 import ScreenContainer from '../components/ScreenContainer';
 import SectionTitle from '../components/SectionTitle';
-import ChurchCardMini from '../components/ChurchCardMini';
 import NewsCard from '../components/NewsCard';
 import ShortcutCard from '../components/ShortcutCard';
 import NextMassItem from '../components/NextMassItem';
 import DailyLiturgyPreview from '../components/DailyLiturgyPreview';
-import { MOCK_CHURCHES, MOCK_MASSES } from '../data/mockData';
+import { MOCK_MASSES } from '../data/mockData';
 import { COLORS, SPACING } from '../constants/theme';
 import {
   useCallback,
@@ -17,6 +16,9 @@ import {
   getLatestNews,
   LatestNewsApiError,
 } from '../services/LatestNews';
+
+import NearbyChurchesSection
+  from '../components/NearbyChurchesSection';
 
 export default function HomeScreen({ navigation }) {
 
@@ -99,25 +101,19 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.title}>Encontre sua próxima celebração</Text>
         <Text style={styles.subtitle}>Igrejas, missas, orações e vida católica em um só lugar.</Text>
 
-        <View style={styles.section}>
-          <SectionTitle
-            title="Igrejas próximas"
-            actionLabel="Ver todas"
-            onActionPress={() => navigation.navigate('Igrejas')}
-          />
-          <FlatList
-            horizontal
-            data={MOCK_CHURCHES.slice(0, 5)}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ChurchCardMini
-                church={item}
-                onPress={() => navigation.navigate('ChurchDetails', { church: item })}
-              />
-            )}
-            showsHorizontalScrollIndicator={false}
-          />
-        </View>
+        <NearbyChurchesSection
+          onSeeAll={() =>
+            navigation.navigate('Igrejas')
+          }
+          onOpenChurch={(church) =>
+            navigation.navigate(
+              'ChurchDetails',
+              {
+                slug: church.slug,
+              }
+            )
+          }
+        />
 
         <View style={styles.section}>
           <SectionTitle title="Acesso rápido" />

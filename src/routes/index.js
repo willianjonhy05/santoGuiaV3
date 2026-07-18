@@ -5,7 +5,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 import HomeScreen from '../pages/HomeScreen';
 import ChurchesScreen from '../pages/ChurchesScreen';
-import ChurchDetailsScreen from '../pages/ChurchDetailsScreen';
+
 import MassesScreen from '../pages/MassesScreen';
 import PrayersScreen from '../pages/PrayersScreen';
 import PrayerDetailScreen from '../pages/PrayerDetailScreen';
@@ -21,6 +21,9 @@ import NewsScreen
 
 import NewsDetailsScreen
   from '../pages/NewsDetailsScreen';
+
+import ChurchDetailsScreen
+  from '../pages/ChurchDetailsScreen';
 
 import ChurchMapScreen
   from '../pages/ChurchMapScreen';
@@ -145,13 +148,6 @@ export default function Routes() {
           }}
         />
 
-        <RootStack.Screen
-          name="ChurchDetails"
-          component={ChurchDetailsScreen}
-          options={{
-            title: 'Detalhes da Igreja',
-          }}
-        />
 
         <RootStack.Screen
           name="PrayerDetail"
@@ -217,6 +213,13 @@ export default function Routes() {
           component={ChurchMapScreen}
           options={{
             title: 'Mapa de Igrejas',
+          }}
+        />
+        <RootStack.Screen
+          name="ChurchDetails"
+          component={ChurchDetailsScreen}
+          options={{
+            title: 'Detalhes da Igreja',
           }}
         />
       </RootStack.Navigator>
