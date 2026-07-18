@@ -14,6 +14,7 @@ import ContactScreen from '../pages/ContactScreen';
 import FavoritesScreen from '../pages/FavoritesScreen';
 import LiturgyScreen from '../pages/LiturgyScreen';
 import SaintOfDayScreen from '../pages/SaintOfDayScreen';
+import ExaminationOfConscienceScreen from '../pages/ExaminationOfConscienceScreen';
 
 import { COLORS } from '../constants/theme';
 
@@ -180,6 +181,13 @@ export default function Routes() {
           title: 'Santo do Dia',
         }}
       />
+      <RootStack.Screen
+      name="ExaminationOfConscience"
+      component={ExaminationOfConscienceScreen}
+      options={{
+        title: 'Exame de Consciência',
+      }}
+    />
       </RootStack.Navigator>
     </NavigationContainer>
   );

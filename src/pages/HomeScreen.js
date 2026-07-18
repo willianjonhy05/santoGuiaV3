@@ -50,7 +50,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.section}>
           <SectionTitle title="Acesso rápido" />
           <View style={styles.shortcutsGrid}>
-            <ShortcutCard title="Exame de Consciência" icon="checkmark-circle-outline" onPress={() => showComingSoon('Exame de Consciência')} />
+            <ShortcutCard title="Exame de Consciência" icon="checkmark-circle-outline" onPress={() => navigation.navigate('ExaminationOfConscience')} />
             <ShortcutCard title="Santo do Dia" icon="sunny-outline" onPress={() => navigation.navigate('SaintOfDay')} />
             <ShortcutCard title="Liturgia Diária" icon="reader-outline" onPress={() => navigation.navigate('Liturgy')} />
             <ShortcutCard title="Orações" icon="book-outline" onPress={() => navigation.navigate('Orações')} />
