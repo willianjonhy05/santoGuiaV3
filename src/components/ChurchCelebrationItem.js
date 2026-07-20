@@ -1,17 +1,32 @@
 import {
+  Alert,
+  Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 
-import Ionicons from '@expo/vector-icons/Ionicons';
+import {
+  useMemo,
+  useState,
+} from 'react';
+
+import Ionicons
+  from '@expo/vector-icons/Ionicons';
+
+import {
+  useFavorites,
+} from '../contexts/FavoritesContext';
 
 import {
   COLORS,
   SPACING,
 } from '../constants/theme';
 
-function buildTimeText(celebration) {
+
+function buildTimeText(
+  celebration
+) {
   if (
     celebration.horarioInicio &&
     celebration.horarioFim
@@ -29,11 +44,194 @@ function buildTimeText(celebration) {
   );
 }
 
-export default function ChurchCelebrationItem({
+
+function buildFavoriteCelebration(
   celebration,
+  church
+) {
+  const celebrationChurch =
+    celebration?.igreja ??
+    church ??
+    null;
+
+  return {
+    ...celebration,
+
+    id:
+      celebration?.id,
+
+    nome:
+      celebration?.nome,
+
+    categoria:
+      celebration?.categoria,
+
+    categoriaDisplay:
+      celebration?.categoriaDisplay,
+
+    recorrencia:
+      celebration?.recorrencia,
+
+    descricaoRecorrencia:
+      celebration?.descricaoRecorrencia,
+
+    descricao:
+      celebration?.descricao,
+
+    dia:
+      celebration?.dia,
+
+    diaDisplay:
+      celebration?.diaDisplay,
+
+    horarioInicio:
+      celebration?.horarioInicio,
+
+    horarioFim:
+      celebration?.horarioFim,
+
+    proximaData:
+      celebration?.proximaData,
+
+    exigeAgendamento:
+      celebration?.exigeAgendamento,
+
+    igreja:
+      celebrationChurch,
+
+    igrejaId:
+      celebration?.igrejaId ??
+      celebrationChurch?.id ??
+      church?.id,
+
+    igrejaSlug:
+      celebration?.igrejaSlug ??
+      celebrationChurch?.slug ??
+      church?.slug,
+
+    igrejaNome:
+      celebration?.igrejaNome ??
+      celebrationChurch?.nome ??
+      church?.nome,
+
+    igrejaEndereco:
+      celebration?.igrejaEndereco ??
+      celebrationChurch?.endereco ??
+      church?.endereco,
+
+    igrejaBairro:
+      celebration?.igrejaBairro ??
+      celebrationChurch?.bairro ??
+      church?.bairro,
+
+    igrejaCidade:
+      celebration?.igrejaCidade ??
+      celebrationChurch?.cidade ??
+      church?.cidade,
+  };
+}
+
+
+export default function
+ChurchCelebrationItem({
+  celebration,
+  church = null,
 }) {
+  const [
+    favoriteLoading,
+    setFavoriteLoading,
+  ] = useState(false);
+
+  const {
+    isCelebrationFavorite,
+    toggleCelebrationFavorite,
+  } = useFavorites();
+
+
+  const favoriteCelebration =
+    useMemo(
+      () =>
+        buildFavoriteCelebration(
+          celebration,
+          church
+        ),
+      [
+        celebration,
+        church,
+      ]
+    );
+
+
+  const isFavorite =
+    isCelebrationFavorite(
+      favoriteCelebration
+    );
+
+
   const timeText =
-    buildTimeText(celebration);
+    buildTimeText(
+      celebration
+    );
+
+
+  async function
+  handleFavoritePress() {
+    if (favoriteLoading) {
+      return;
+    }
+
+    if (!celebration?.id) {
+      Alert.alert(
+        'Não foi possível favoritar',
+        (
+          'A celebração não possui um ' +
+          'identificador válido.'
+        )
+      );
+
+      return;
+    }
+
+    setFavoriteLoading(true);
+
+    try {
+      const result =
+        await toggleCelebrationFavorite(
+          favoriteCelebration
+        );
+
+      if (
+        result?.favorite &&
+        result?.notificationScheduled ===
+          false
+      ) {
+        Alert.alert(
+          'Adicionado aos favoritos',
+          (
+            'A celebração foi salva, mas o ' +
+            'lembrete não pôde ser ativado. ' +
+            'Verifique a permissão de notificações.'
+          )
+        );
+      }
+    } catch (error) {
+      console.error(
+        'Erro ao favoritar celebração:',
+        error
+      );
+
+      Alert.alert(
+        'Erro',
+        (
+          error?.message ||
+          'Não foi possível atualizar os favoritos.'
+        )
+      );
+    } finally {
+      setFavoriteLoading(false);
+    }
+  }
+
 
   return (
     <View style={styles.container}>
@@ -46,18 +244,69 @@ export default function ChurchCelebrationItem({
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.name}>
-          {celebration.nome}
-        </Text>
+        <View style={styles.titleRow}>
+          <View style={styles.titleContent}>
+            <Text style={styles.name}>
+              {celebration.nome}
+            </Text>
 
-        {celebration.categoriaDisplay ? (
-          <Text style={styles.category}>
-            {
-              celebration
-                .categoriaDisplay
+            {celebration
+              .categoriaDisplay ? (
+              <Text style={styles.category}>
+                {
+                  celebration
+                    .categoriaDisplay
+                }
+              </Text>
+            ) : null}
+          </View>
+
+          <Pressable
+            onPress={
+              handleFavoritePress
             }
-          </Text>
-        ) : null}
+            disabled={
+              favoriteLoading
+            }
+            accessibilityRole="button"
+            accessibilityLabel={
+              isFavorite
+                ? (
+                  'Remover celebração dos favoritos'
+                )
+                : (
+                  'Adicionar celebração aos favoritos'
+                )
+            }
+            style={({ pressed }) => [
+              styles.favoriteButton,
+
+              isFavorite &&
+                styles
+                  .favoriteButtonActive,
+
+              pressed &&
+                styles.pressed,
+
+              favoriteLoading &&
+                styles.disabled,
+            ]}
+          >
+            <Ionicons
+              name={
+                isFavorite
+                  ? 'heart'
+                  : 'heart-outline'
+              }
+              size={22}
+              color={
+                isFavorite
+                  ? COLORS.primary
+                  : COLORS.textMuted
+              }
+            />
+          </Pressable>
+        </View>
 
         <View style={styles.schedule}>
           {celebration.diaDisplay ? (
@@ -78,11 +327,7 @@ export default function ChurchCelebrationItem({
 
         {celebration
           .descricaoRecorrencia ? (
-          <Text
-            style={
-              styles.recurrence
-            }
-          >
+          <Text style={styles.recurrence}>
             {
               celebration
                 .descricaoRecorrencia
@@ -91,11 +336,7 @@ export default function ChurchCelebrationItem({
         ) : null}
 
         {celebration.descricao ? (
-          <Text
-            style={
-              styles.description
-            }
-          >
+          <Text style={styles.description}>
             {celebration.descricao}
           </Text>
         ) : null}
@@ -109,9 +350,7 @@ export default function ChurchCelebrationItem({
               color={COLORS.primary}
             />
 
-            <Text
-              style={styles.badgeText}
-            >
+            <Text style={styles.badgeText}>
               Exige agendamento
             </Text>
           </View>
@@ -120,6 +359,7 @@ export default function ChurchCelebrationItem({
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -130,7 +370,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 14,
-    backgroundColor: COLORS.surface,
+    backgroundColor:
+      COLORS.surface,
   },
 
   icon: {
@@ -146,6 +387,18 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
+    minWidth: 0,
+  },
+
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+
+  titleContent: {
+    flex: 1,
+    minWidth: 0,
+    paddingRight: SPACING.xs,
   },
 
   name: {
@@ -159,6 +412,21 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 12,
     fontWeight: '700',
+  },
+
+  favoriteButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -7,
+    marginRight: -7,
+    borderRadius: 20,
+  },
+
+  favoriteButtonActive: {
+    backgroundColor:
+      `${COLORS.primary}12`,
   },
 
   schedule: {
@@ -211,5 +479,13 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 11,
     fontWeight: '800',
+  },
+
+  pressed: {
+    opacity: 0.65,
+  },
+
+  disabled: {
+    opacity: 0.45,
   },
 });
