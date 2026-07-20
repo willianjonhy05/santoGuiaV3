@@ -7,6 +7,11 @@ import {
   useState,
 } from 'react';
 
+import {
+  cancelCelebrationReminder,
+  scheduleCelebrationReminder,
+} from '../services/CelebrationNotifications';
+
 import AsyncStorage
   from '@react-native-async-storage/async-storage';
 
@@ -189,6 +194,8 @@ function compactCelebration(
   const igreja =
     compactChurch(churchSource);
 
+
+
   return {
     id:
       celebration.id,
@@ -198,6 +205,11 @@ function compactCelebration(
         id: celebration.id,
         categoria,
       }),
+
+    notificationId:
+      normalizeText(
+        celebration.notificationId
+      ),
 
     nome:
       normalizeText(
@@ -651,7 +663,7 @@ export function FavoritesProvider({
 
   const removeCelebrationFavorite =
     useCallback(
-      (
+      async (
         celebrationOrId,
         category
       ) => {
@@ -661,84 +673,170 @@ export function FavoritesProvider({
             category
           );
 
+        const existing =
+          favoriteCelebrations.find(
+            (item) => {
+              if (key) {
+                return (
+                  item.favoriteKey ===
+                  key
+                );
+              }
+
+              return (
+                String(item.id) ===
+                String(
+                  celebrationOrId
+                )
+              );
+            }
+          );
+
+        if (existing) {
+          await cancelCelebrationReminder(
+            existing.notificationId
+          );
+        }
+
         setFavoriteCelebrations(
-          (current) => {
-            /*
-             * Quando recebe somente o ID,
-             * remove pelo ID.
-             */
-            if (
-              typeof celebrationOrId !==
-                'object' &&
-              !category
-            ) {
-              return current.filter(
-                (item) =>
+          (current) =>
+            current.filter(
+              (item) => {
+                if (key) {
+                  return (
+                    item.favoriteKey !==
+                    key
+                  );
+                }
+
+                return (
                   String(item.id) !==
                   String(
                     celebrationOrId
                   )
-              );
-            }
-
-            return current.filter(
-              (item) =>
-                item.favoriteKey !== key
-            );
-          }
+                );
+              }
+            )
         );
       },
-      []
+      [favoriteCelebrations]
     );
 
 
   const toggleCelebrationFavorite =
     useCallback(
-      (celebration) => {
+      async (celebration) => {
         const normalizedCelebration =
           compactCelebration(
             celebration
           );
 
         if (!normalizedCelebration) {
-          return;
+          return {
+            favorite: false,
+            notificationScheduled:
+              false,
+          };
         }
 
-        setFavoriteCelebrations(
-          (current) => {
-            const exists =
-              current.some(
-                (item) =>
-                  item.favoriteKey ===
-                  normalizedCelebration
-                    .favoriteKey
-              );
+        const existing =
+          favoriteCelebrations.find(
+            (item) =>
+              item.favoriteKey ===
+              normalizedCelebration
+                .favoriteKey
+          );
 
-            if (exists) {
-              return current.filter(
+        /*
+         * Já é favorita:
+         * cancela a notificação e remove.
+         */
+        if (existing) {
+          await cancelCelebrationReminder(
+            existing.notificationId
+          );
+
+          setFavoriteCelebrations(
+            (current) =>
+              current.filter(
                 (item) =>
                   item.favoriteKey !==
                   normalizedCelebration
                     .favoriteKey
+              )
+          );
+
+          return {
+            favorite: false,
+            notificationScheduled:
+              false,
+          };
+        }
+
+        let notificationId = '';
+
+        try {
+          notificationId =
+            await scheduleCelebrationReminder(
+              celebration
+            ) || '';
+        } catch (error) {
+          console.error(
+            'Erro ao agendar lembrete:',
+            error
+          );
+        }
+
+        const favoriteWithNotification = {
+          ...normalizedCelebration,
+          notificationId,
+        };
+
+        setFavoriteCelebrations(
+          (current) => {
+            const alreadyExists =
+              current.some(
+                (item) =>
+                  item.favoriteKey ===
+                  favoriteWithNotification
+                    .favoriteKey
               );
+
+            if (alreadyExists) {
+              return current;
             }
 
             return [
-              normalizedCelebration,
+              favoriteWithNotification,
               ...current,
             ];
           }
         );
+
+        return {
+          favorite: true,
+
+          notificationScheduled:
+            Boolean(notificationId),
+        };
       },
-      []
+      [favoriteCelebrations]
     );
 
 
   const clearCelebrationFavorites =
-    useCallback(() => {
-      setFavoriteCelebrations([]);
-    }, []);
+    useCallback(async () => {
+      await Promise.all(
+        favoriteCelebrations.map(
+          (celebration) =>
+            cancelCelebrationReminder(
+              celebration.notificationId
+            )
+        )
+      );
 
+      setFavoriteCelebrations([]);
+    }, [favoriteCelebrations]);
 
   const value = useMemo(
     () => ({

@@ -1,10 +1,19 @@
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, useNavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import HomeScreen from '../pages/HomeScreen';
 import ChurchesScreen from '../pages/ChurchesScreen';
+
+import {
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
+
+import * as Notifications
+  from 'expo-notifications';
 
 import MassesScreen from '../pages/MassesScreen';
 import PrayersScreen from '../pages/PrayersScreen';
@@ -124,14 +133,163 @@ const navigationTheme = {
 };
 
 export default function Routes() {
+  const navigationRef =
+    useNavigationContainerRef();
+
+  const pendingChurchSlugRef =
+    useRef(null);
+
+  const processedResponseRef =
+    useRef(null);
+
+  const handleNotificationResponse =
+    useCallback(
+      async (response) => {
+        if (!response) {
+          return;
+        }
+
+        const notification =
+          response.notification;
+
+        const content =
+          notification
+            ?.request
+            ?.content;
+
+        const data =
+          content?.data;
+
+        const churchSlug =
+          data?.churchSlug;
+
+        if (!churchSlug) {
+          return;
+        }
+
+        /*
+         * Evita abrir duas vezes quando a mesma
+         * resposta é encontrada pelo listener e
+         * pela consulta inicial.
+         */
+        const responseKey = [
+          notification
+            ?.request
+            ?.identifier,
+
+          notification?.date,
+
+          churchSlug,
+        ].join(':');
+
+        if (
+          processedResponseRef.current ===
+          responseKey
+        ) {
+          return;
+        }
+
+        processedResponseRef.current =
+          responseKey;
+
+        /*
+         * Se o NavigationContainer ainda não
+         * estiver pronto, guarda o slug.
+         */
+        if (!navigationRef.isReady()) {
+          pendingChurchSlugRef.current =
+            churchSlug;
+
+          return;
+        }
+
+        navigationRef.navigate(
+          'ChurchDetails',
+          {
+            slug: churchSlug,
+          }
+        );
+      },
+      [navigationRef]
+    );
+
+  useEffect(() => {
+    /*
+     * Trata o toque quando o aplicativo
+     * está aberto ou em segundo plano.
+     */
+    const subscription =
+      Notifications
+        .addNotificationResponseReceivedListener(
+          handleNotificationResponse
+        );
+
+    /*
+     * Trata o caso em que o aplicativo
+     * estava fechado e foi iniciado pelo
+     * toque na notificação.
+     */
+    async function checkInitialNotification() {
+      try {
+        const response =
+          await Notifications
+            .getLastNotificationResponseAsync();
+
+        if (response) {
+          await handleNotificationResponse(
+            response
+          );
+
+          await Notifications
+            .clearLastNotificationResponseAsync();
+        }
+      } catch (error) {
+        console.error(
+          'Erro ao verificar notificação inicial:',
+          error
+        );
+      }
+    }
+
+    checkInitialNotification();
+
+    return () => {
+      subscription.remove();
+    };
+  }, [handleNotificationResponse]);
+
+  function handleNavigationReady() {
+    const churchSlug =
+      pendingChurchSlugRef.current;
+
+    if (!churchSlug) {
+      return;
+    }
+
+    pendingChurchSlugRef.current = null;
+
+    navigationRef.navigate(
+      'ChurchDetails',
+      {
+        slug: churchSlug,
+      }
+    );
+  }
+
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer
+      ref={navigationRef}
+      theme={navigationTheme}
+      onReady={handleNavigationReady}
+    >
       <RootStack.Navigator
         screenOptions={{
-          headerTintColor: COLORS.surface,
+          headerTintColor:
+            COLORS.surface,
 
           headerStyle: {
-            backgroundColor: COLORS.primary,
+            backgroundColor:
+              COLORS.primary,
           },
 
           headerTitleStyle: {
@@ -139,7 +297,8 @@ export default function Routes() {
           },
 
           contentStyle: {
-            backgroundColor: COLORS.background,
+            backgroundColor:
+              COLORS.background,
           },
         }}
       >
@@ -150,7 +309,6 @@ export default function Routes() {
             headerShown: false,
           }}
         />
-
 
         <RootStack.Screen
           name="PrayerDetail"
@@ -164,7 +322,7 @@ export default function Routes() {
           name="Favorites"
           component={FavoritesScreen}
           options={{
-            title: 'Igrejas Favoritas',
+            title: 'Favoritos',
           }}
         />
 
@@ -175,6 +333,7 @@ export default function Routes() {
             title: 'Fale Conosco',
           }}
         />
+
         <RootStack.Screen
           name="Liturgy"
           component={LiturgyScreen}
@@ -182,6 +341,7 @@ export default function Routes() {
             title: 'Liturgia Diária',
           }}
         />
+
         <RootStack.Screen
           name="SaintOfDay"
           component={SaintOfDayScreen}
@@ -189,13 +349,18 @@ export default function Routes() {
             title: 'Santo do Dia',
           }}
         />
+
         <RootStack.Screen
           name="ExaminationOfConscience"
-          component={ExaminationOfConscienceScreen}
+          component={
+            ExaminationOfConscienceScreen
+          }
           options={{
-            title: 'Exame de Consciência',
+            title:
+              'Exame de Consciência',
           }}
         />
+
         <RootStack.Screen
           name="News"
           component={NewsScreen}
@@ -211,6 +376,7 @@ export default function Routes() {
             title: 'Notícia',
           }}
         />
+
         <RootStack.Screen
           name="ChurchMap"
           component={ChurchMapScreen}
@@ -218,18 +384,22 @@ export default function Routes() {
             title: 'Mapa de Igrejas',
           }}
         />
+
         <RootStack.Screen
           name="ChurchDetails"
           component={ChurchDetailsScreen}
           options={{
-            title: 'Detalhes da Igreja',
+            title:
+              'Detalhes da Igreja',
           }}
         />
+
         <RootStack.Screen
           name="ClericDetails"
           component={ClericDetailsScreen}
           options={{
-            title: 'Detalhes do clérigo',
+            title:
+              'Detalhes do clérigo',
           }}
         />
       </RootStack.Navigator>

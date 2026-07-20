@@ -1,9 +1,14 @@
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+
+import {
+  useState,
+} from 'react';
 
 import Ionicons
   from '@expo/vector-icons/Ionicons';
@@ -90,11 +95,23 @@ export default function NextMassItem({
   onPress,
 }) {
   /*
-   * Mantém compatibilidade com o
-   * antigo uso mass={mass}.
+   * Mantém compatibilidade com:
+   *
+   * <NextMassItem mass={mass} />
+   *
+   * e:
+   *
+   * <NextMassItem
+   *   celebration={celebration}
+   * />
    */
   const item =
     celebration ?? mass;
+
+  const [
+    favoriteLoading,
+    setFavoriteLoading,
+  ] = useState(false);
 
   const {
     isCelebrationFavorite,
@@ -115,31 +132,93 @@ export default function NextMassItem({
     isCelebrationFavorite(item);
 
 
-  function handleFavoritePress(
+  async function handleFavoritePress(
     event
   ) {
     /*
-     * Evita que o clique no coração
-     * também abra ChurchDetails.
+     * Impede que o toque no coração
+     * execute também o onPress do card.
      */
     event?.stopPropagation?.();
 
-    toggleCelebrationFavorite(
-      item
-    );
+    /*
+     * Evita múltiplos agendamentos
+     * causados por toques repetidos.
+     */
+    if (favoriteLoading) {
+      return;
+    }
+
+    setFavoriteLoading(true);
+
+    try {
+      const result =
+        await toggleCelebrationFavorite(
+          item
+        );
+
+      /*
+       * Usa optional chaining para não
+       * quebrar se o contexto ainda estiver
+       * retornando undefined.
+       */
+      if (
+        result?.favorite === true &&
+        result?.notificationScheduled ===
+          false
+      ) {
+        Alert.alert(
+          'Celebração favoritada',
+          (
+            'A celebração foi adicionada aos favoritos, ' +
+            'mas o lembrete não pôde ser agendado. ' +
+            'Verifique a permissão de notificações.'
+          )
+        );
+      }
+    } catch (error) {
+      console.error(
+        'Erro ao alterar celebração favorita:',
+        error
+      );
+
+      Alert.alert(
+        'Não foi possível concluir',
+        (
+          'Ocorreu um erro ao adicionar ou remover ' +
+          'a celebração dos favoritos.'
+        )
+      );
+    } finally {
+      setFavoriteLoading(false);
+    }
   }
 
 
   return (
     <Pressable
       onPress={onPress}
+      disabled={!onPress}
       accessibilityRole={
-        onPress ? 'button' : undefined
+        onPress
+          ? 'button'
+          : undefined
+      }
+      accessibilityLabel={
+        onPress
+          ? (
+            `Abrir detalhes de ${getChurchName(
+              item
+            )}`
+          )
+          : undefined
       }
       style={({ pressed }) => [
         styles.row,
+
         pressed &&
-          styles.rowPressed,
+        onPress &&
+        styles.rowPressed,
       ]}
     >
       <View style={styles.timeBox}>
@@ -156,7 +235,14 @@ export default function NextMassItem({
           {getChurchName(item)}
         </Text>
 
-
+        {item.nome ? (
+          <Text
+            style={styles.celebrationName}
+            numberOfLines={1}
+          >
+            {item.nome}
+          </Text>
+        ) : null}
 
         {item.proxima_data ? (
           <Text style={styles.date}>
@@ -185,29 +271,50 @@ export default function NextMassItem({
           onPress={
             handleFavoritePress
           }
+          disabled={favoriteLoading}
           hitSlop={10}
           accessibilityRole="button"
           accessibilityLabel={
             favorite
-              ? 'Remover dos favoritos'
-              : 'Adicionar aos favoritos'
+              ? 'Remover celebração dos favoritos'
+              : 'Adicionar celebração aos favoritos'
           }
+          accessibilityState={{
+            selected: favorite,
+            disabled: favoriteLoading,
+            busy: favoriteLoading,
+          }}
           style={({ pressed }) => [
             styles.favoriteButton,
 
+            favorite &&
+              styles.favoriteButtonActive,
+
             pressed &&
+              !favoriteLoading &&
               styles.favoritePressed,
+
+            favoriteLoading &&
+              styles.favoriteLoading,
           ]}
         >
-          <Ionicons
-            name={
-              favorite
-                ? 'heart'
-                : 'heart-outline'
-            }
-            size={23}
-            color={COLORS.primary}
-          />
+          {favoriteLoading ? (
+            <Ionicons
+              name="hourglass-outline"
+              size={21}
+              color={COLORS.primary}
+            />
+          ) : (
+            <Ionicons
+              name={
+                favorite
+                  ? 'heart'
+                  : 'heart-outline'
+              }
+              size={23}
+              color={COLORS.primary}
+            />
+          )}
         </Pressable>
 
         {onPress ? (
@@ -230,10 +337,10 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
     padding: SPACING.md,
     borderRadius: RADIUS.md,
-    backgroundColor:
-      COLORS.surface,
     borderWidth: 1,
     borderColor: COLORS.border,
+    backgroundColor:
+      COLORS.surface,
   },
 
   rowPressed: {
@@ -302,13 +409,19 @@ const styles = StyleSheet.create({
   },
 
   favoriteButton: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 19,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     backgroundColor:
       COLORS.background,
+  },
+
+  favoriteButtonActive: {
+    borderColor: COLORS.primary,
   },
 
   favoritePressed: {
@@ -318,5 +431,9 @@ const styles = StyleSheet.create({
         scale: 0.92,
       },
     ],
+  },
+
+  favoriteLoading: {
+    opacity: 0.55,
   },
 });

@@ -11,7 +11,7 @@
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#F8F5F1",
-      "primatryColor": "#7A1F2B",
+      "primaryColor": "#7A1F2B",
       "plugins": [
         [
           "expo-splash-screen",
@@ -31,7 +31,18 @@
           {
             "locationWhenInUsePermission": "Permita que o SantoGuia use sua localização para encontrar as igrejas mais próximas."
           }
+        ],
+        [
+          "expo-notifications",
+          {
+            "icon": "./assets/notification-icon.png",
+            "color": "#7A1F2B",
+            "sounds": [
+              "./assets/notification-sound.wav"
+            ]
+          }
         ]
+        
       ]
     },
     "ios": {
@@ -46,7 +57,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#7A1F2B"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.SCHEDULE_EXACT_ALARM"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
