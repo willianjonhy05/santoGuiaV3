@@ -19,6 +19,12 @@ import {
   LocaleConfig,
 } from 'react-native-calendars';
 
+import {
+  formatDateLong,
+  formatDateShort,
+  getLocalDateString,
+} from '../utils/date';
+
 import SaintOfDayContent from '../components/SaintOfDayContent';
 
 import {
@@ -88,27 +94,15 @@ LocaleConfig.locales['pt-br'] = {
 
 LocaleConfig.defaultLocale = 'pt-br';
 
-function getLocalDateString() {
-  const today = new Date();
-
-  const year = today.getFullYear();
-
-  const month = String(
-    today.getMonth() + 1
-  ).padStart(2, '0');
-
-  const day = String(
-    today.getDate()
-  ).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-}
 
 export default function SaintOfDayScreen() {
   const today = getLocalDateString();
 
   const [selectedDate, setSelectedDate] =
     useState(today);
+
+  const [calendarVisible, setCalendarVisible] =
+    useState(false);
 
   const [saint, setSaint] = useState(null);
 
@@ -214,7 +208,7 @@ export default function SaintOfDayScreen() {
 
         const errorMessage =
           requestError instanceof
-          SantoDoDiaApiError
+            SantoDoDiaApiError
             ? requestError.message
             : (
               'Não foi possível carregar ' +
@@ -244,12 +238,13 @@ export default function SaintOfDayScreen() {
       return;
     }
 
-    setSelectedDate(
-      day.dateString
-    );
+    setSelectedDate(day.dateString);
+    setCalendarVisible(false);
   }
 
   function handleToday() {
+    setCalendarVisible(false);
+
     if (selectedDate === today) {
       setReloadKey(
         (current) => current + 1
@@ -319,7 +314,7 @@ export default function SaintOfDayScreen() {
             styles.todayButton,
 
             pressed &&
-              styles.buttonPressed,
+            styles.buttonPressed,
           ]}
         >
           <Text
@@ -332,71 +327,98 @@ export default function SaintOfDayScreen() {
         </Pressable>
       </View>
 
-      <View
-        style={styles.calendarContainer}
+      <Pressable
+        onPress={() =>
+          setCalendarVisible(
+            (current) => !current
+          )
+        }
+        style={({ pressed }) => [
+          styles.calendarToggleButton,
+          pressed && styles.buttonPressed,
+        ]}
       >
-        <Calendar
-          /*
-           * A chave muda quando o usuário
-           * navega para outro mês pelo botão
-           * "Hoje".
-           */
-          key={selectedDate.slice(0, 7)}
-          current={selectedDate}
-          firstDay={1}
-          enableSwipeMonths
-          hideExtraDays={false}
-          onDayPress={handleSelectDate}
-          markedDates={markedDates}
-          theme={{
-            calendarBackground:
-              COLORS.surface,
+        <View style={styles.calendarToggleContent}>
+          <Text style={styles.calendarToggleLabel}>
+            Data selecionada
+          </Text>
 
-            backgroundColor:
-              COLORS.surface,
+          <Text style={styles.calendarToggleDate}>
+            {formatDateLong(selectedDate)}
+          </Text>
+        </View>
 
-            textSectionTitleColor:
-              COLORS.textMuted,
+        <Text style={styles.calendarToggleAction}>
+          {calendarVisible
+            ? 'Ocultar'
+            : 'Alterar'}
+        </Text>
+      </Pressable>
 
-            selectedDayBackgroundColor:
-              COLORS.primary,
+      {calendarVisible ? (
+        <View style={styles.calendarContainer}>
+          <Calendar
+            /*
+             * A chave muda quando o usuário
+             * navega para outro mês pelo botão
+             * "Hoje".
+             */
+            key={selectedDate.slice(0, 7)}
+            current={selectedDate}
+            firstDay={1}
+            enableSwipeMonths
+            hideExtraDays={false}
+            onDayPress={handleSelectDate}
+            markedDates={markedDates}
+            theme={{
+              calendarBackground:
+                COLORS.surface,
 
-            selectedDayTextColor:
-              COLORS.surface,
+              backgroundColor:
+                COLORS.surface,
 
-            todayTextColor:
-              COLORS.primary,
+              textSectionTitleColor:
+                COLORS.textMuted,
 
-            dayTextColor:
-              COLORS.text,
+              selectedDayBackgroundColor:
+                COLORS.primary,
 
-            textDisabledColor:
-              COLORS.border,
+              selectedDayTextColor:
+                COLORS.surface,
 
-            dotColor:
-              COLORS.primary,
+              todayTextColor:
+                COLORS.primary,
 
-            selectedDotColor:
-              COLORS.surface,
+              dayTextColor:
+                COLORS.text,
 
-            arrowColor:
-              COLORS.primary,
+              textDisabledColor:
+                COLORS.border,
 
-            monthTextColor:
-              COLORS.text,
+              dotColor:
+                COLORS.primary,
 
-            indicatorColor:
-              COLORS.primary,
+              selectedDotColor:
+                COLORS.surface,
 
-            textMonthFontWeight:
-              '800',
+              arrowColor:
+                COLORS.primary,
 
-            textDayHeaderFontWeight:
-              '700',
-          }}
-        />
-      </View>
+              monthTextColor:
+                COLORS.text,
 
+              indicatorColor:
+                COLORS.primary,
+
+              textMonthFontWeight:
+                '800',
+
+              textDayHeaderFontWeight:
+                '700',
+            }}
+          />
+        </View>
+      ) : null}
       {loading && !refreshing ? (
         <View style={styles.stateContainer}>
           <ActivityIndicator
@@ -430,7 +452,7 @@ export default function SaintOfDayScreen() {
               styles.retryButton,
 
               pressed &&
-                styles.buttonPressed,
+              styles.buttonPressed,
             ]}
           >
             <Text
@@ -445,8 +467,8 @@ export default function SaintOfDayScreen() {
       ) : null}
 
       {!loading &&
-      !error &&
-      saint ? (
+        !error &&
+        saint ? (
         <SaintOfDayContent
           saint={saint}
         />
@@ -582,6 +604,44 @@ const styles = StyleSheet.create({
 
   retryButtonText: {
     color: COLORS.surface,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  calendarToggleButton: {
+    minHeight: 58,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 14,
+    backgroundColor: COLORS.surface,
+  },
+
+  calendarToggleContent: {
+    flex: 1,
+    paddingRight: SPACING.md,
+  },
+
+  calendarToggleLabel: {
+    color: COLORS.textMuted,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+
+  calendarToggleDate: {
+    marginTop: 3,
+    color: COLORS.text,
+    fontSize: 15,
+    fontWeight: '800',
+    
+  },
+
+  calendarToggleAction: {
+    color: COLORS.primary,
     fontSize: 14,
     fontWeight: '800',
   },

@@ -77,7 +77,7 @@ function normalizeItems(items) {
 export default function LiturgyScreen() {
   const today = useMemo(() => getLocalDateString(), []);
   const [selectedDate, setSelectedDate] = useState(today);
-  const [calendarVisible, setCalendarVisible] = useState(true);
+  const [calendarVisible, setCalendarVisible] = useState(false);
   const { liturgy, loading, error, retry } = useLiturgy(selectedDate);
 
   const markedDates = useMemo(
@@ -173,7 +173,10 @@ export default function LiturgyScreen() {
               enableSwipeMonths
               hideExtraDays={false}
               markedDates={markedDates}
-              onDayPress={(day) => setSelectedDate(day.dateString)}
+              onDayPress={(day) => {
+                setSelectedDate(day.dateString);
+                setCalendarVisible(false);
+              }}
               theme={{
                 calendarBackground: COLORS.surface,
                 textSectionTitleColor: COLORS.textMuted,

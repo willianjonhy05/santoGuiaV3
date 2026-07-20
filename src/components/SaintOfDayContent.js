@@ -81,20 +81,13 @@ export default function SaintOfDayContent({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.date}>
-          {formatDate(saint.data)}
-        </Text>
+        
 
         <Text style={styles.name}>
           {saint.nome}
         </Text>
 
-        {saint.titulo &&
-          saint.titulo !== saint.nome ? (
-          <Text style={styles.originalTitle}>
-            {saint.titulo}
-          </Text>
-        ) : null}
+        
       </View>
 
       {saint.imagem_url ? (
@@ -253,13 +246,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
 
-  date: {
-    marginBottom: SPACING.xs,
-    color: COLORS.primary,
-    fontSize: 14,
-    fontWeight: '700',
-    textTransform: 'capitalize',
-  },
+
 
   name: {
     color: COLORS.text,
@@ -269,13 +256,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  originalTitle: {
-    marginTop: SPACING.xs,
-    color: COLORS.textMuted,
-    fontSize: 13,
-    lineHeight: 19,
-    textAlign: 'center',
-  },
 
   imageContainer: {
     width: '100%',
