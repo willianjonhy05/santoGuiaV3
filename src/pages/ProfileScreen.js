@@ -123,6 +123,15 @@ export default function ProfileScreen({
               )
             }
           />
+          <CustomButton
+            title="Celebrações favoritas"
+            variant="secondary"
+            onPress={() =>
+              navigation.navigate(
+                'FavoriteCelebrations'
+              )              
+            }
+          />
         </View>
 
         <View style={styles.socialSection}>

@@ -31,6 +31,9 @@ import NewsScreen
 import NewsDetailsScreen
   from '../pages/NewsDetailsScreen';
 
+import FavoriteCelebrationsScreen
+  from '../pages/FavoriteCelebrationsScreen';
+
 import ChurchDetailsScreen
   from '../pages/ChurchDetailsScreen';
 
@@ -400,6 +403,16 @@ export default function Routes() {
           options={{
             title:
               'Detalhes do clérigo',
+          }}
+        />
+        <RootStack.Screen
+          name="FavoriteCelebrations"
+          component={
+            FavoriteCelebrationsScreen
+          }
+          options={{
+            title:
+              'Celebrações favoritas',
           }}
         />
       </RootStack.Navigator>

@@ -180,21 +180,66 @@ function compactCelebration(
     ) || 'celebracao';
 
   const churchSource =
-    celebration.igreja || {
+    celebration.igreja ||
+    celebration.church ||
+    {
       id:
-        celebration.igreja_id,
+        celebration.igreja_id ??
+        celebration.igrejaId ??
+        celebration.churchId,
 
       slug:
-        celebration.igreja_slug,
+        celebration.igreja_slug ||
+        celebration.igrejaSlug ||
+        celebration.churchSlug,
 
       nome:
-        celebration.igreja_nome,
+        celebration.igreja_nome ||
+        celebration.igrejaNome ||
+        celebration.churchName,
+
+      endereco:
+        celebration.igreja_endereco ||
+        celebration.igrejaEndereco,
+
+      bairro:
+        celebration.igreja_bairro ||
+        celebration.igrejaBairro,
+
+      cidade:
+        celebration.igreja_cidade ||
+        celebration.igrejaCidade,
     };
 
   const igreja =
-    compactChurch(churchSource);
+    compactChurch(
+      churchSource
+    );
 
+  const horarioInicio =
+    normalizeText(
+      celebration.horario_inicio ??
+      celebration.horarioInicio ??
+      celebration.time
+    );
 
+  const horarioFim =
+    normalizeText(
+      celebration.horario_fim ??
+      celebration.horarioFim
+    );
+
+  const proximaData =
+    normalizeText(
+      celebration.proxima_data ??
+      celebration.proximaData
+    );
+
+  const proximaDataIso =
+    normalizeText(
+      celebration.proxima_data_iso ??
+      celebration.proximaDataIso
+    );
 
   return {
     id:
@@ -202,26 +247,30 @@ function compactCelebration(
 
     favoriteKey:
       getCelebrationKey({
-        id: celebration.id,
+        id:
+          celebration.id,
+
         categoria,
       }),
 
     notificationId:
       normalizeText(
-        celebration.notificationId
+        celebration.notificationId ??
+        celebration.notification_id
       ),
 
     nome:
       normalizeText(
-        celebration.nome
-      ) ||
-      'Celebração',
+        celebration.nome ??
+        celebration.name
+      ) || 'Celebração',
 
     categoria,
 
     categoria_display:
       normalizeText(
-        celebration.categoria_display
+        celebration.categoria_display ??
+        celebration.categoriaDisplay
       ),
 
     recorrencia:
@@ -231,70 +280,77 @@ function compactCelebration(
 
     recorrencia_display:
       normalizeText(
-        celebration.recorrencia_display
+        celebration.recorrencia_display ??
+        celebration.recorrenciaDisplay
       ),
 
     descricao_recorrencia:
       normalizeText(
-        celebration.descricao_recorrencia
+        celebration.descricao_recorrencia ??
+        celebration.descricaoRecorrencia
       ),
 
     dia:
       normalizeText(
-        celebration.dia
+        celebration.dia ??
+        celebration.day
       ),
 
     dia_display:
       normalizeText(
-        celebration.dia_display
+        celebration.dia_display ??
+        celebration.diaDisplay
       ),
 
     proxima_data:
-      normalizeText(
-        celebration.proxima_data
-      ),
+      proximaData,
 
     proxima_data_iso:
-      normalizeText(
-        celebration.proxima_data_iso
-      ),
+      proximaDataIso,
 
     horario_inicio:
-      normalizeText(
-        celebration.horario_inicio
-      ),
+      horarioInicio,
 
     horario_fim:
-      normalizeText(
-        celebration.horario_fim
-      ),
+      horarioFim,
 
     descricao:
       normalizeText(
-        celebration.descricao
+        celebration.descricao ??
+        celebration.description
       ),
 
     exige_agendamento:
       Boolean(
-        celebration.exige_agendamento
+        celebration.exige_agendamento ??
+        celebration.exigeAgendamento
       ),
 
     igreja_id:
       celebration.igreja_id ??
+      celebration.igrejaId ??
       igreja?.id ??
       null,
 
     igreja_slug:
       normalizeText(
-        celebration.igreja_slug
+        celebration.igreja_slug ??
+        celebration.igrejaSlug
       ) ||
       igreja?.slug ||
+      '',
+
+    igreja_nome:
+      normalizeText(
+        celebration.igreja_nome ??
+        celebration.igrejaNome
+      ) ||
+      igreja?.nome ||
       '',
 
     igreja,
   };
 }
-
 
 export function FavoritesProvider({
   children,
