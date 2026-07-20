@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   date: {
     color: COLORS.textMuted,
     fontSize: 12,
-    textTransform: 'capitalize',
+    
   },
 
   title: {

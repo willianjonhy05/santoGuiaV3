@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
         flex: 1,
         color: COLORS.textMuted,
         fontSize: 13,
-        textTransform: 'capitalize',
+        
     },
 
     excerpt: {
