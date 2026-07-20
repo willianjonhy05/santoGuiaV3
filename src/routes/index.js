@@ -41,7 +41,7 @@ const TAB_ICONS = {
   Igrejas: ['business', 'business-outline'],
   Missas: ['calendar', 'calendar-outline'],
   Orações: ['book', 'book-outline'],
-  Perfil: ['person', 'person-outline'],
+  Opções: ['menu', 'menu-outline'],
 };
 
 function MainTabs() {
@@ -102,7 +102,7 @@ function MainTabs() {
       />
 
       <Tab.Screen
-        name="Perfil"
+        name="Opções"
         component={ProfileScreen}
       />
     </Tab.Navigator>
