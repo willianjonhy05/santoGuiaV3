@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: SPACING.md,
+    margin: SPACING.xs,
     paddingHorizontal: SPACING.md,
     borderRadius: RADIUS.md,
     backgroundColor: COLORS.surface,
