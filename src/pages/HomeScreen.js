@@ -419,7 +419,7 @@ export default function HomeScreen({
           actionLabel="Ver agenda"
           onActionPress={() =>
             navigation.navigate(
-              'Confissoes'
+              'Confessions'
             )
           }
           celebrations={
