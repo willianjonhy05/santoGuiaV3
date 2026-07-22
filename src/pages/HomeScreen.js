@@ -18,6 +18,8 @@ import {
 
 import * as Location from 'expo-location';
 
+import ChurchMapCardHome from '../components/ChurchMapCardHome';
+
 import ScreenContainer
   from '../components/ScreenContainer';
 
@@ -347,15 +349,6 @@ export default function HomeScreen({
               }
             />
 
-            <ShortcutCard
-              title="Navegar no mapa"
-              icon="map-outline"
-              onPress={() =>
-                navigation.navigate(
-                  'ChurchMap'
-                )
-              }
-            />
 
             <ShortcutCard
               title="Santo do Dia"
@@ -388,6 +381,17 @@ export default function HomeScreen({
             />
           </View>
         </View>
+
+
+        <ChurchMapCardHome
+
+          onPress={() =>
+            navigation.navigate(
+              'ChurchMap'
+            )
+          }
+
+        />
 
         <NearbyCelebrationSection
           title="Próximas missas"
@@ -436,7 +440,7 @@ export default function HomeScreen({
           actionLabel="Ver agenda"
           onActionPress={() =>
             navigation.navigate(
-              'Adoracoes'
+              'Adorations'
             )
           }
           celebrations={
@@ -452,7 +456,7 @@ export default function HomeScreen({
           }
         />
 
-       
+
         <View style={styles.section}>
           <SectionTitle
             title="Notícias da Arquidiocese"

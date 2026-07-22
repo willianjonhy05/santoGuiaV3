@@ -4,7 +4,7 @@ import {
 } from './UpcomingCelebrationsApi';
 
 
-const ENDPOINT =
+export const UPCOMING_NOVENAS_ENDPOINT =
   '/celebracoes/novenas/proximas/';
 
 
@@ -17,9 +17,33 @@ export function getUpcomingNovenas(
   filters = {},
   options = {}
 ) {
+  const pagina =
+    filters.pagina ??
+    filters.page ??
+    1;
+
+
   return fetchUpcomingCelebrations(
-    ENDPOINT,
-    filters,
+    UPCOMING_NOVENAS_ENDPOINT,
+    {
+      ...filters,
+      pagina,
+    },
+    options
+  );
+}
+
+
+export function getUpcomingNovenasPage(
+  pagina,
+  filters = {},
+  options = {}
+) {
+  return getUpcomingNovenas(
+    {
+      ...filters,
+      pagina,
+    },
     options
   );
 }

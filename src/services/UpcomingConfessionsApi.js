@@ -4,7 +4,7 @@ import {
 } from './UpcomingCelebrationsApi';
 
 
-const ENDPOINT =
+export const UPCOMING_CONFESSIONS_ENDPOINT =
   '/celebracoes/confissoes/proximas/';
 
 
@@ -17,9 +17,33 @@ export function getUpcomingConfessions(
   filters = {},
   options = {}
 ) {
+  const pagina =
+    filters.pagina ??
+    filters.page ??
+    1;
+
+
   return fetchUpcomingCelebrations(
-    ENDPOINT,
-    filters,
+    UPCOMING_CONFESSIONS_ENDPOINT,
+    {
+      ...filters,
+      pagina,
+    },
+    options
+  );
+}
+
+
+export function getUpcomingConfessionsPage(
+  pagina,
+  filters = {},
+  options = {}
+) {
+  return getUpcomingConfessions(
+    {
+      ...filters,
+      pagina,
+    },
     options
   );
 }

@@ -31,6 +31,18 @@ import NewsScreen
 import NewsDetailsScreen
   from '../pages/NewsDetailsScreen';
 
+import AdorationsScreen
+  from '../pages/AdorationsScreen';
+
+import WordCelebrationsScreen
+  from '../pages/WordCelebrationsScreen';
+
+import NovenasScreen
+  from '../pages/NovenasScreen';
+
+import ConfessionsScreen
+  from '../pages/ConfessionsScreen';
+
 import FavoriteCelebrationsScreen
   from '../pages/FavoriteCelebrationsScreen';
 
@@ -342,6 +354,37 @@ export default function Routes() {
           component={LiturgyScreen}
           options={{
             title: 'Liturgia Diária',
+          }}
+        />
+        <RootStack.Screen
+          name="Adorations"
+          component={AdorationsScreen}
+          options={{
+            title: 'Adorações',
+          }}
+        />
+
+        <RootStack.Screen
+          name="WordCelebrations"
+          component={WordCelebrationsScreen}
+          options={{
+            title: 'Celebrações da Palavra',
+          }}
+        />
+
+        <RootStack.Screen
+          name="Novenas"
+          component={NovenasScreen}
+          options={{
+            title: 'Novenas',
+          }}
+        />
+
+        <RootStack.Screen
+          name="Confessions"
+          component={ConfessionsScreen}
+          options={{
+            title: 'Confissões',
           }}
         />
 

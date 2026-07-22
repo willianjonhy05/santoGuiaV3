@@ -1,69 +1,87 @@
 {
   "expo": {
     "name": "Santo Guia",
-    "slug": "santoGuia",
+    "slug": "santo-guia",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F8F5F1",
-      "primaryColor": "#7A1F2B",
-      "plugins": [
-        [
-          "expo-splash-screen",
-          {
-            "image": "./assets/splash-icon.png",
-            "imageWidth": 220,
-            "resizeMode": "contain",
-            "backgroundColor": "#7A1F2B",
-            "dark": {
-              "image": "./assets/splash-icon.png",
-              "backgroundColor": "#57151E"
-            }
-          }
-        ],
-        [
-          "expo-location",
-          {
-            "locationWhenInUsePermission": "Permita que o SantoGuia use sua localização para encontrar as igrejas mais próximas."
-          }
-        ],
-        [
-          "expo-notifications",
-          {
-            "icon": "./assets/icon.png",
-            "color": "#7A1F2B",
-            "sounds": [
-              "./assets/notification-sound.wav"
-            ]
-          }
-        ]
-        
-      ]
+      "backgroundColor": "#F8F5F1"
     },
+
     "ios": {
       "supportsTablet": true,
       "icon": "./assets/icon.png",
-      "bundleIdentifier": "br.com.missaemteresina.santoguia"
+      "bundleIdentifier": "br.com.missaemteresina.santoguia",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Permita que o Santo Guia use sua localização para encontrar as igrejas mais próximas."
+      }
     },
+
     "android": {
       "package": "br.com.missaemteresina.santoguia",
       "softwareKeyboardLayoutMode": "pan",
+
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#7A1F2B"
       },
+
       "edgeToEdgeEnabled": true,
+
       "permissions": [
-        "android.permission.SCHEDULE_EXACT_ALARM"
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.VIBRATE"
       ]
     },
+
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#7A1F2B",
+
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#57151E"
+          }
+        }
+      ],
+
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Permita que o Santo Guia use sua localização para encontrar as igrejas mais próximas."
+        }
+      ],
+
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#7A1F2B",
+          "sounds": [
+            "./assets/notification-sound.wav"
+          ]
+        }
+      ],
+
+      "expo-font"
+    ]
   }
 }

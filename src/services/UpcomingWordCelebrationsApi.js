@@ -4,7 +4,7 @@ import {
 } from './UpcomingCelebrationsApi';
 
 
-const ENDPOINT =
+export const UPCOMING_WORD_CELEBRATIONS_ENDPOINT =
   '/celebracoes/palavra/proximas/';
 
 
@@ -13,14 +13,37 @@ export {
 };
 
 
-export function
-getUpcomingWordCelebrations(
+export function getUpcomingWordCelebrations(
   filters = {},
   options = {}
 ) {
+  const pagina =
+    filters.pagina ??
+    filters.page ??
+    1;
+
+
   return fetchUpcomingCelebrations(
-    ENDPOINT,
-    filters,
+    UPCOMING_WORD_CELEBRATIONS_ENDPOINT,
+    {
+      ...filters,
+      pagina,
+    },
+    options
+  );
+}
+
+
+export function getUpcomingWordCelebrationsPage(
+  pagina,
+  filters = {},
+  options = {}
+) {
+  return getUpcomingWordCelebrations(
+    {
+      ...filters,
+      pagina,
+    },
     options
   );
 }
