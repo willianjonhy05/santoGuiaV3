@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 11,
     fontWeight: '700',
-    textTransform: 'capitalize',
+    
   },
 
   title: {

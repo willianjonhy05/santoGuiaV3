@@ -24,7 +24,7 @@
       "package": "br.com.missaemteresina.santoguia",
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive_icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#F2F5F7"
       },
       "edgeToEdgeEnabled": true,
@@ -34,6 +34,30 @@
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.SCHEDULE_EXACT_ALARM",
         "android.permission.VIBRATE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "instagram.com"
+            },
+            {
+              "scheme": "https",
+              "host": "facebook.com"
+            },
+            {
+              "scheme": "https",
+              "host": "x.com"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
       ]
     },
     "web": {

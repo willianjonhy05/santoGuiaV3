@@ -1,12 +1,18 @@
 import {
-  Alert,
-  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+
+import Constants from 'expo-constants';
+
+import socialNetworks
+  from '../constants/socialNetworks';
+
+import openSocialLink
+  from '../utils/openSocialLink';
 
 import {
   Ionicons,
@@ -37,6 +43,8 @@ export default function ProfileScreen({
     isReady,
   } = useFavorites();
 
+  const appVersion =
+    Constants.expoConfig?.version || '0.0.0';
 
   const churchesCount =
     Array.isArray(favorites)
@@ -73,70 +81,7 @@ export default function ProfileScreen({
       );
 
 
-  async function openSocialLink(
-    url
-  ) {
-    try {
-      const supported =
-        await Linking.canOpenURL(
-          url
-        );
-
-      if (!supported) {
-        Alert.alert(
-          'Não foi possível abrir',
-          (
-            'Este endereço não está ' +
-            'disponível no momento.'
-          )
-        );
-
-        return;
-      }
-
-      await Linking.openURL(
-        url
-      );
-    } catch {
-      Alert.alert(
-        'Erro',
-        (
-          'Não foi possível abrir ' +
-          'este endereço.'
-        )
-      );
-    }
-  }
-
-
-  const socialNetworks = [
-    {
-      name: 'Instagram',
-      icon: 'logo-instagram',
-      url:
-        'https://www.instagram.com/missaemteresina',
-    },
-    {
-      name: 'X',
-      icon: 'logo-twitter',
-      url:
-        'https://x.com/missaemteresina',
-    },
-    {
-      name: 'E-mail',
-      icon: 'mail-outline',
-      url:
-        'mailto:missaemteresina@gmail.com',
-    },
-    {
-      name: 'Facebook',
-      icon: 'logo-facebook',
-      url:
-        'https://www.facebook.com/missaemteresina',
-    },
-  ];
-
-
+ 
   return (
     <ScreenContainer>
       <ScrollView
@@ -155,6 +100,10 @@ export default function ProfileScreen({
           Configurações, informações e
           outros recursos do aplicativo
           Santo Guia.
+        </Text>
+
+        <Text style={styles.version}>
+          Versão {appVersion}
         </Text>
 
         <View style={styles.links}>
@@ -434,4 +383,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  version: {
+  marginTop: SPACING.sm,
+  color: COLORS.textMuted,
+  fontSize: 13,
+  fontWeight: '600',
+},
 });
