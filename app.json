@@ -2,18 +2,16 @@
   "expo": {
     "name": "Santo Guia",
     "slug": "santo-guia",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash_icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F8F5F1"
+      "backgroundColor": "#F2F5F7"
     },
-
     "ios": {
       "supportsTablet": true,
       "icon": "./assets/icon.png",
@@ -22,18 +20,14 @@
         "NSLocationWhenInUseUsageDescription": "Permita que o Santo Guia use sua localização para encontrar as igrejas mais próximas."
       }
     },
-
     "android": {
       "package": "br.com.missaemteresina.santoguia",
       "softwareKeyboardLayoutMode": "pan",
-
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#7A1F2B"
+        "foregroundImage": "./assets/adaptive_icon.png",
+        "backgroundColor": "#F2F5F7"
       },
-
       "edgeToEdgeEnabled": true,
-
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
@@ -42,46 +36,46 @@
         "android.permission.VIBRATE"
       ]
     },
-
     "web": {
       "favicon": "./assets/favicon.png"
     },
-
     "plugins": [
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
+          "image": "./assets/splash_icon.png",
           "imageWidth": 220,
           "resizeMode": "contain",
-          "backgroundColor": "#7A1F2B",
-
+          "backgroundColor": "#f2f5F7",
           "dark": {
-            "image": "./assets/splash-icon.png",
-            "backgroundColor": "#57151E"
+            "image": "./assets/splash_icon.png",
+            "backgroundColor": "#f2f5F7"
           }
         }
       ],
-
       [
         "expo-location",
         {
           "locationWhenInUsePermission": "Permita que o Santo Guia use sua localização para encontrar as igrejas mais próximas."
         }
       ],
-
       [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",
-          "color": "#7A1F2B",
+          "color": "#F2F5F7",
           "sounds": [
-            "./assets/notification-sound.wav"
+            "./assets/notification_sound.wav"
           ]
         }
       ],
-
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "60780ee7-2563-4650-a680-bc95580023b7"
+      }
+    },
+    "owner": "willianjohny05"
   }
 }

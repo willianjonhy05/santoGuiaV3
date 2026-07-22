@@ -31,9 +31,12 @@ import {
 
 
 import {
-    COLORS,
-    SPACING,
+  COLORS,
+  RADIUS,
+  SPACING
 } from '../constants/theme';
+
+
 
 
 

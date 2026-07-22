@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
 
     alignItems: 'center',
 
-    marginHorizontal: SPACING.md,
+    marginHorizontal: SPACING.xs,
 
     marginVertical: SPACING.md,
 

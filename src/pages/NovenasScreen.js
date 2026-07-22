@@ -28,6 +28,7 @@ import {
 import {
   COLORS,
   SPACING,
+  RADIUS
 } from '../constants/theme';
 
 
@@ -173,7 +174,6 @@ export default function NovenasScreen({
     <ScreenContainer>
 
       <FlatList
-
         data={
           error
             ? []
@@ -186,7 +186,7 @@ export default function NovenasScreen({
         }
 
 
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
 
           <NextMassItem
 
@@ -233,11 +233,11 @@ export default function NovenasScreen({
 
 
               onChangeFilter={
-                (field,value)=>
+                (field, value) =>
                   setDraftFilters(
-                    current=>({
+                    current => ({
                       ...current,
-                      [field]:value
+                      [field]: value
                     })
                   )
               }
@@ -277,9 +277,9 @@ export default function NovenasScreen({
 
           loading ? null :
 
-          <Text>
-            Nenhuma novena encontrada.
-          </Text>
+            <Text>
+              Nenhuma novena encontrada.
+            </Text>
 
         )}
 
