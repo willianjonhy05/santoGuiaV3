@@ -602,6 +602,34 @@ const LEAFLET_HTML = `
         }
 
         if (
+  userLocation &&
+  isValidCoordinate(
+    Number(userLocation.latitude),
+    Number(userLocation.longitude)
+  )
+) {
+
+  window.setTimeout(
+    function () {
+
+      map.setView(
+        [
+          Number(userLocation.latitude),
+          Number(userLocation.longitude)
+        ],
+        16,
+        {
+          animate: true,
+        }
+      );
+
+    },
+    300
+  );
+
+}
+
+        if (
           !hasFittedMap &&
           churches.length > 0
         ) {

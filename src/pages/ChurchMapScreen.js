@@ -526,6 +526,7 @@ export default function ChurchMapScreen() {
         ?.centerOnUser();
     }, []);
 
+
   const openDirections =
     useCallback(
       async (church) => {
