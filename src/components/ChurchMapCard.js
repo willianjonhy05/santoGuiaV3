@@ -1,11 +1,17 @@
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 
-import Ionicons from '@expo/vector-icons/Ionicons';
+import {
+  useNavigation,
+} from '@react-navigation/native';
+
+import Ionicons from
+  '@expo/vector-icons/Ionicons';
 
 import {
   COLORS,
@@ -13,55 +19,173 @@ import {
 } from '../constants/theme';
 
 function formatDistance(distanceKm) {
+  const parsedDistance =
+    Number(distanceKm);
+
   if (
-    distanceKm === null ||
-    distanceKm === undefined
+    !Number.isFinite(parsedDistance) ||
+    parsedDistance < 0
   ) {
     return null;
   }
 
-  if (distanceKm < 1) {
+  if (parsedDistance < 1) {
     return `${Math.round(
-      distanceKm * 1000
+      parsedDistance * 1000
     )} m`;
   }
 
-  return `${distanceKm.toFixed(1)} km`;
+  return `${parsedDistance.toFixed(1)} km`;
+}
+
+function normalizeSlug(value) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return '';
+  }
+
+  return String(value)
+    .trim()
+    .replace(/^\/+|\/+$/g, '');
+}
+
+function extractSlugFromUrl(value) {
+  if (!value) {
+    return '';
+  }
+
+  const url = String(value).trim();
+
+  const match = url.match(
+    /\/igrejas\/([^/?#]+)\/?/i
+  );
+
+  return normalizeSlug(
+    match?.[1]
+  );
+}
+
+function createSlugFromName(value) {
+  if (!value) {
+    return '';
+  }
+
+  return String(value)
+    .normalize('NFD')
+    .replace(
+      /[\u0300-\u036f]/g,
+      ''
+    )
+    .toLowerCase()
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function getChurchSlug(church) {
+  return (
+    normalizeSlug(
+      church?.slug
+    ) ||
+    extractSlugFromUrl(
+      church?.detailsUrl
+    ) ||
+    extractSlugFromUrl(
+      church?.detailUrl
+    ) ||
+    extractSlugFromUrl(
+      church?.url
+    ) ||
+    extractSlugFromUrl(
+      church?.link
+    ) ||
+    createSlugFromName(
+      church?.name
+    )
+  );
 }
 
 export default function ChurchMapCard({
   church,
   selected = false,
   onPress,
-  onOpenDirections,
   style,
 }) {
+  const navigation =
+    useNavigation();
+
   if (!church) {
     return null;
   }
+
+  const churchName =
+    church.name || 'Igreja';
 
   const formattedDistance =
     formatDistance(
       church.distanceKm
     );
 
+  function openChurchDetails(event) {
+    event?.stopPropagation?.();
+
+    const slug =
+      getChurchSlug(church);
+
+    if (!slug) {
+      Alert.alert(
+        'Detalhes indisponíveis',
+        'Esta igreja não possui um identificador válido para abrir a página de detalhes.'
+      );
+
+      return;
+    }
+
+    navigation.navigate(
+      'ChurchDetails',
+      {
+        slug,
+
+        /*
+         * O objeto também é enviado para
+         * permitir uma exibição imediata
+         * caso a tela de detalhes use esse
+         * dado como fallback.
+         */
+        church,
+      }
+    );
+  }
+
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
+      accessibilityState={{
+        selected,
+      }}
       accessibilityLabel={
-        `Selecionar ${church.name}`
+        `Selecionar ${churchName}`
       }
       style={({ pressed }) => [
         styles.card,
+
         selected &&
           styles.cardSelected,
+
         pressed &&
           styles.cardPressed,
+
         style,
       ]}
     >
-      <View style={styles.iconContainer}>
+      <View
+        style={
+          styles.iconContainer
+        }
+      >
         <Ionicons
           name="location-outline"
           size={25}
@@ -74,7 +198,7 @@ export default function ChurchMapCard({
           style={styles.name}
           numberOfLines={2}
         >
-          {church.name}
+          {churchName}
         </Text>
 
         {church.addressLine ? (
@@ -112,29 +236,32 @@ export default function ChurchMapCard({
           )}
 
           <Pressable
-            onPress={(event) => {
-              event.stopPropagation?.();
-              onOpenDirections?.();
-            }}
-            accessibilityRole="link"
+            onPress={
+              openChurchDetails
+            }
+            accessibilityRole="button"
+            accessibilityLabel={
+              `Ver detalhes de ${churchName}`
+            }
             style={({ pressed }) => [
-              styles.routeButton,
+              styles.detailsButton,
+
               pressed &&
-                styles.routeButtonPressed,
+                styles.detailsButtonPressed,
             ]}
           >
             <Ionicons
-              name="map-outline"
-              size={16}
+              name="information-circle-outline"
+              size={17}
               color={COLORS.surface}
             />
 
             <Text
               style={
-                styles.routeButtonText
+                styles.detailsButtonText
               }
             >
-              Traçar rota
+              Ver igreja
             </Text>
           </Pressable>
         </View>
@@ -151,12 +278,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 18,
-    backgroundColor: COLORS.surface,
+    backgroundColor:
+      COLORS.surface,
   },
 
   cardSelected: {
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor:
+      COLORS.primary,
   },
 
   cardPressed: {
@@ -195,7 +324,8 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent:
+      'space-between',
     marginTop: 'auto',
     paddingTop: SPACING.sm,
   },
@@ -212,21 +342,24 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  routeButton: {
+  detailsButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.sm,
+    paddingHorizontal:
+      SPACING.sm,
+    paddingVertical:
+      SPACING.sm,
     borderRadius: 10,
-    backgroundColor: COLORS.primary,
+    backgroundColor:
+      COLORS.primary,
   },
 
-  routeButtonPressed: {
+  detailsButtonPressed: {
     opacity: 0.7,
   },
 
-  routeButtonText: {
+  detailsButtonText: {
     color: COLORS.surface,
     fontSize: 12,
     fontWeight: '800',
